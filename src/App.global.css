@@ -2,59 +2,65 @@
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@font-face {
+  font-family: 'Computer Modern';
+  src: url(fonts/cmunti.ttf);
+}
+
 body {
   position: relative;
-  color: white;
   height: 100vh;
-  background: linear-gradient(
-    200.96deg,
-    #fedc2a -29.09%,
-    #dd5789 51.77%,
-    #7a2c9e 129.35%
-  );
-  font-family: sans-serif;
   overflow-y: hidden;
-  display: flex;
+  /* display: flex; */
   justify-content: center;
   align-items: center;
 }
 
-button {
-  background-color: white;
-  padding: 10px 20px;
+.home-main {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+    url('https://f4.bcbits.com/img/a2312567325_10.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  /* animation: myanim 30s infinite;
+  -webkit-animation: myanim 30s infinite; */
+}
+
+.player-details-type {
+  font-family: 'Computer Modern' !important;
+}
+
+.rounded {
   border-radius: 10px;
-  border: none;
-  appearance: none;
-  font-size: 1.3rem;
-  box-shadow: 0px 8px 28px -6px rgba(24, 39, 75, 0.12),
-    0px 18px 88px -4px rgba(24, 39, 75, 0.14);
-  transition: transform ease-in 0.1s;
-  cursor: pointer;
 }
 
-button:hover {
-  transform: scale(1.05);
+.player-details-grid > * {
+  align-self: center;
 }
 
-li {
-  list-style: none;
+@keyframes myanim {
+  0% {
+    background-position: 0 -300px;
+  }
+  50% {
+    background-position: 0px 100px;
+  }
+  100% {
+    background-position: 0 -300px;
+  }
 }
 
-a {
-  text-decoration: none;
-  height: fit-content;
-  width: fit-content;
-  margin: 10px;
-}
-
-a:hover {
-  opacity: 1;
-  text-decoration: none;
-}
-
-.Hello {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 20px 0;
+@-webkit-keyframes myanim
+/* Safari and Chrome */ {
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 20px 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
 }
