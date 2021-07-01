@@ -19,17 +19,42 @@ import {
   IconButton,
   Icon,
   Divider,
+  Text,
 } from '@chakra-ui/react';
 
-import { RiSettings2Line, RiSpotifyFill, RiGithubFill } from 'react-icons/ri';
+import {
+  RiSettings2Line,
+  RiSpotifyFill,
+  RiGithubFill,
+  RiInformationFill,
+} from 'react-icons/ri';
+import { BrowserWindow } from 'electron';
+import { Link } from 'react-router-dom';
 import MusicPlayer from '../components/MusicPlayer';
+import { spotifyLoginURI } from '../config/spotify';
+import store from '../app/store/store';
+
+//console.log(store.getState());
+// const authWindow = new BrowserWindow({
+//   width: 800,
+//   height: 600,
+//   show: false,
+//   'node-integration': false,
+// });
+
+// authWindow.loadURL(spotifyLoginURI);
 
 interface Props {}
 
-function DrawerExample() {
+function SettingsDrawer() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = React.useRef();
 
+  const onSave = () => {
+    return null;
+  };
+
+  const openSpotifyAuthWindow = () => {};
   return (
     <>
       <IconButton
@@ -62,12 +87,14 @@ function DrawerExample() {
                 isFullWidth
                 leftIcon={<RiSpotifyFill />}
                 colorScheme="green"
+                onClick={openSpotifyAuthWindow}
               >
                 Sign Into Spotify
               </Button>
-              <>
+              <VStack alignItems="flex-start" w="100%">
+                <Text>Configure</Text>
                 <Input placeholder="Music Directory" variant="filled" />
-              </>
+              </VStack>
             </VStack>
           </DrawerBody>
 
@@ -84,21 +111,29 @@ function DrawerExample() {
 }
 
 export const Home = (props: Props) => {
+  const { player } = store.getState();
   return (
-    <Box className="home-main" height="100vh" padding={8}>
+    <Box
+      className="home-main"
+      height="100vh"
+      padding={8}
+      _before={{ backgroundImage: player.current['image'] }}
+    >
       <Flex flexDirection="column" height="100%">
-        <Flex>
+        <Flex alignItems="center">
           <ButtonGroup>
             <IconButton
               aria-label="Github"
               variant="ghost"
               isRound
               size="lg"
-              icon={<RiGithubFill />}
+              icon={<RiInformationFill />}
             />
           </ButtonGroup>
           <Spacer />
-          <DrawerExample />
+          <Heading size="md">Showboat</Heading>
+          <Spacer />
+          <SettingsDrawer />
         </Flex>
         <Spacer />
         <Box>

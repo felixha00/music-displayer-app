@@ -15,6 +15,8 @@ import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
+import { ipcRenderer } from 'electron/renderer';
+import { readSong } from './app/store/actions/playerActions';
 
 export default class AppUpdater {
   constructor() {
@@ -68,9 +70,10 @@ const createWindow = async () => {
   };
 
   mainWindow = new BrowserWindow({
+    title: 'Showboat',
     show: false,
-    width: 1024,
-    height: 728,
+    width: 800,
+    height: 600,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       nodeIntegration: true,

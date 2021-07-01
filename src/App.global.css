@@ -6,7 +6,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @font-face {
   font-family: 'Computer Modern';
-  src: url(fonts/cmunti.ttf);
+  src: url(fonts/cmunrm.ttf);
 }
 
 body {
@@ -19,17 +19,40 @@ body {
 }
 
 .home-main {
-  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-    url('https://f4.bcbits.com/img/a2312567325_10.jpg');
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
+  /* background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+    url('https://f4.bcbits.com/img/a2312567325_10.jpg'); */
   /* animation: myanim 30s infinite;
   -webkit-animation: myanim 30s infinite; */
 }
 
+.home-main::before {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: -1;
+  display: block;
+  background-image: url('https://i.imgur.com/lL6tQfy.png');
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  -webkit-filter: blur(5px);
+  -moz-filter: blur(5px);
+  -o-filter: blur(5px);
+  -ms-filter: blur(5px);
+  filter: blur(5px) brightness(0.2);
+  /* animation: myanim 60s infinite;
+  -webkit-animation: myanim 60s infinite; */
+}
+
 .player-details-type {
   font-family: 'Computer Modern' !important;
+  font-size: 14px;
 }
 
 .rounded {
@@ -42,13 +65,13 @@ body {
 
 @keyframes myanim {
   0% {
-    background-position: 0 -300px;
+    background-position: 0 -100px;
   }
   50% {
-    background-position: 0px 100px;
+    background-position: 0px 0px;
   }
   100% {
-    background-position: 0 -300px;
+    background-position: 0 -100px;
   }
 }
 

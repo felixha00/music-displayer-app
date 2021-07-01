@@ -51,3 +51,4 @@ npm-debug.log.*
 
 # User
 *.mp3
+src/config/spotify.ts
