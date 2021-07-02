@@ -14,8 +14,8 @@ import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import MenuBuilder from './menu';
 import { ipcRenderer } from 'electron/renderer';
+import MenuBuilder from './menu';
 import { readSong } from './app/store/actions/playerActions';
 
 export default class AppUpdater {

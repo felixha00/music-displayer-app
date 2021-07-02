@@ -8,6 +8,6 @@ export interface ISong {
   title: string;
   artist: string;
   album: string;
-  image?: string;
+  image: string;
   length: number;
 }

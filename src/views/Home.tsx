@@ -28,30 +28,18 @@ import {
   RiGithubFill,
   RiInformationFill,
 } from 'react-icons/ri';
-import { BrowserWindow } from 'electron';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import MusicPlayer from '../components/MusicPlayer';
 import { spotifyLoginURI } from '../config/spotify';
-import store from '../app/store/store';
-
-//console.log(store.getState());
-// const authWindow = new BrowserWindow({
-//   width: 800,
-//   height: 600,
-//   show: false,
-//   'node-integration': false,
-// });
-
-// authWindow.loadURL(spotifyLoginURI);
-
-interface Props {}
+import store, { RootState } from '../app/store/store';
+import SettingsForm from '../components/Settings/SettingsForm';
 
 function SettingsDrawer() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = React.useRef();
-
   const onSave = () => {
-    return null;
+    return onClose();
   };
 
   const openSpotifyAuthWindow = () => {};
@@ -91,9 +79,9 @@ function SettingsDrawer() {
               >
                 Sign Into Spotify
               </Button>
+
               <VStack alignItems="flex-start" w="100%">
-                <Text>Configure</Text>
-                <Input placeholder="Music Directory" variant="filled" />
+                <SettingsForm onSave={onSave} />
               </VStack>
             </VStack>
           </DrawerBody>
@@ -102,7 +90,9 @@ function SettingsDrawer() {
             <Button variant="g" mr={3} onClick={onClose}>
               Cancel
             </Button>
-            <Button colorScheme="blue">Save</Button>
+            <Button colorScheme="blue" onClick={onSave}>
+              Save
+            </Button>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
@@ -110,14 +100,20 @@ function SettingsDrawer() {
   );
 }
 
-export const Home = (props: Props) => {
-  const { player } = store.getState();
+const Home = (props: Props) => {
+  // let player;
+  // store.subscribe(() => {
+  //   const { player } = store.getState();
+  // });
+  const { player } = useSelector((state: RootState) => ({
+    player: state.player,
+  }));
   return (
     <Box
       className="home-main"
       height="100vh"
-      padding={8}
-      _before={{ backgroundImage: player.current['image'] }}
+      padding={16}
+      _before={{ backgroundImage: player.current.image }}
     >
       <Flex flexDirection="column" height="100%">
         <Flex alignItems="center">
@@ -131,7 +127,11 @@ export const Home = (props: Props) => {
             />
           </ButtonGroup>
           <Spacer />
-          <Heading size="md">Showboat</Heading>
+          <marquee>
+            {' '}
+            <Text size="md">HEHEHE web dev OMEGA L Y L</Text>
+          </marquee>
+
           <Spacer />
           <SettingsDrawer />
         </Flex>
@@ -143,5 +143,11 @@ export const Home = (props: Props) => {
     </Box>
   );
 };
+
+// const mapStateToProps = (state) => ({
+//   player: state.player,
+// });
+
+// const mapDispatchToProps = {};
 
 export default Home;

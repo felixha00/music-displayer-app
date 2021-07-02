@@ -1,4 +1,6 @@
+import * as fs from 'fs';
 import * as mm from 'music-metadata';
+import store from '../app/store/store';
 
 // (async () => {
 //     try {
@@ -30,7 +32,8 @@ export const formatMetadata = (metadata: mm.IAudioMetadata) => {
     // console.log(b64img);
     b64img = parseBase64(picture[0].format, picture[0].data.toString('base64'));
   } else {
-    b64img = '';
+    b64img =
+      'https://www.gothiccountry.se/images/pictures2/no_album_art__no_cover.jpg';
   }
 
   const songData = {
@@ -51,9 +54,12 @@ export const getMetadata = async (songPath: string): Promise<any> => {
   //   ...defaultMetadata,
   //   path: trackPath,
   // };
+  const path = '高音質Ringed Genesis - EdelritterArcaea.mp3';
   try {
     const metadata = await mm.parseFile(
-      'assets/Porter Robinson - Sewer Idol Project - 09 Get Your Wish (Sewerslvt Remix).mp3',
+      `D:/Songs/${songPath}`,
+
+      //'asd',
       {}
     );
 
@@ -88,5 +94,13 @@ export const getMetadata = async (songPath: string): Promise<any> => {
 
     return {};
   }
+};
+
+export const readFilesInDirectory = (path: fs.PathLike) => {
+  fs.readdir(path, (err, files) => {
+    files.forEach((file) => {
+      console.log(file);
+    });
+  });
 };
 export default {};
