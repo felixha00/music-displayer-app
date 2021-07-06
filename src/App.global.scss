@@ -45,7 +45,7 @@ body {
   -moz-filter: blur(5px);
   -o-filter: blur(5px);
   -ms-filter: blur(5px);
-  filter: blur(5px) brightness(0.2);
+  filter: blur(5px) brightness(0.3);
   animation: myanim 360s infinite;
   -webkit-animation: myanim 360s infinite;
 }
@@ -71,6 +71,10 @@ body {
 div[role='progressbar'] {
   background-color: white;
   border-radius: 9999px;
+}
+
+.chakra-progress {
+  background-color: transparent !important;
 }
 
 @keyframes myanim {

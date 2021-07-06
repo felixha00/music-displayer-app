@@ -34,15 +34,37 @@ import MusicPlayer from '../components/MusicPlayer';
 import { spotifyLoginURI } from '../config/spotify';
 import store, { RootState } from '../app/store/store';
 import SettingsForm from '../components/Settings/SettingsForm';
+import { setQueue, shuffleQueue } from '../app/store/actions/playerActions';
+import { JSONtoPlaylist, parseCSV } from '../utils/exportifyUtils';
+import {
+  findAllSongPathsFromDir,
+  parseFiles,
+  readAllandParse,
+  parseFiles2,
+  function2,
+  parsePlaylist,
+} from '../utils/file';
+import { ipcRenderer } from 'electron';
+import Loading from './Loading';
 
 function SettingsDrawer() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = React.useRef();
-  const onSave = () => {
-    return onClose();
-  };
 
   const openSpotifyAuthWindow = () => {};
+  const handleParsePlaylist = () => {
+    parsePlaylist();
+  };
+  const handleJSONToPlaylist = async () => {
+    let h = [];
+    let metadatas = [];
+    await function2().then(() => console.log('a'));
+    // await readAllandParse('D:\\Songs', '.mp3', h)
+    //   .then((x) => {
+    //     return Promise.all(h);
+    //   })
+    //   .then((g) => console.log(g));
+  };
   return (
     <>
       <IconButton
@@ -70,7 +92,7 @@ function SettingsDrawer() {
           </DrawerHeader>
 
           <DrawerBody>
-            <VStack alignItems="flex-start" divider={<Divider />} spacing={8}>
+            <VStack alignItems="flex-start" spacing={8}>
               <Button
                 isFullWidth
                 leftIcon={<RiSpotifyFill />}
@@ -80,20 +102,11 @@ function SettingsDrawer() {
                 Sign Into Spotify
               </Button>
 
-              <VStack alignItems="flex-start" w="100%">
-                <SettingsForm onSave={onSave} />
-              </VStack>
+              <SettingsForm />
+              <Button onClick={handleJSONToPlaylist}>Convert Playlist</Button>
+              <Button onClick={handleParsePlaylist}>Parse Playlist</Button>
             </VStack>
           </DrawerBody>
-
-          <DrawerFooter>
-            <Button variant="g" mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button colorScheme="blue" onClick={onSave}>
-              Save
-            </Button>
-          </DrawerFooter>
         </DrawerContent>
       </Drawer>
     </>
@@ -105,9 +118,20 @@ const Home = (props: Props) => {
   // store.subscribe(() => {
   //   const { player } = store.getState();
   // });
-  const { player } = useSelector((state: RootState) => ({
+  const { player, settings } = useSelector((state: RootState) => ({
     player: state.player,
+    settings: state.settings,
   }));
+
+  React.useEffect(() => {
+    setQueue(settings.config.musicDir, 50);
+    // findAllSongPathsFromDir(settings.config.musicDir);
+  }, [settings.config.musicDir]);
+
+  React.useEffect(() => {
+    //JSONtoPlaylist();
+  });
+
   return (
     <Box
       className="home-main"
@@ -115,6 +139,7 @@ const Home = (props: Props) => {
       padding={16}
       _before={{ backgroundImage: player.current.image }}
     >
+      <Loading loading={player.loading} />
       <Flex flexDirection="column" height="100%">
         <Flex alignItems="center">
           <ButtonGroup>
@@ -129,7 +154,9 @@ const Home = (props: Props) => {
           <Spacer />
           <marquee>
             {' '}
-            <Text size="md">HEHEHE web dev OMEGA L Y L</Text>
+            <Text size="md">
+              HEHEHE web dev OMEGALUL HEHEHE electron app OMEGA L Y L
+            </Text>
           </marquee>
 
           <Spacer />
@@ -149,5 +176,8 @@ const Home = (props: Props) => {
 // });
 
 // const mapDispatchToProps = {};
+ipcRenderer.on('show-toast', (evt, message) => {
+  console.log(message); // Returns: {'SAVED': 'File Saved'}
+});
 
 export default Home;

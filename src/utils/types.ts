@@ -5,9 +5,12 @@ export interface Action {
 }
 
 export interface ISong {
-  title: string;
-  artist: string;
-  album: string;
-  image: string;
-  length: number;
+  title: string | undefined;
+  artist: string | undefined;
+  album: string | undefined;
+  image: string | undefined;
+  length: number | undefined;
+  bpm: number | undefined;
+  year: number | undefined;
+  songPath: string;
 }

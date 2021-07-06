@@ -1,6 +1,13 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import {
+  configureStore,
+  combineReducers,
+  applyMiddleware,
+  createStore,
+} from '@reduxjs/toolkit';
+import logger from 'redux-logger';
 import playerReducer from './reducers/playerReducer';
 import settingsReducer from './reducers/settingsReducer';
+// import Store from 'electron-store';
 
 const rootReducer = combineReducers({
   player: playerReducer,
@@ -9,8 +16,8 @@ const rootReducer = combineReducers({
 
 export type RootState = ReturnType<typeof rootReducer>;
 
-const store = configureStore({
-  reducer: rootReducer,
-});
+// export const eStore = new Store();
+
+const store = createStore(rootReducer, applyMiddleware(logger));
 
 export default store;

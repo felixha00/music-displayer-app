@@ -11,12 +11,13 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { ipcRenderer } from 'electron/renderer';
 import MenuBuilder from './menu';
-import { readSong } from './app/store/actions/playerActions';
+// import { eStore } from './app/store/store';
+// const Store = require('electron-store');
 
 export default class AppUpdater {
   constructor() {
@@ -40,6 +41,13 @@ if (
   require('electron-debug')();
 }
 
+// if (process.env.NODE_ENV === "development") {
+//  mainWindow.webContents.on("did-frame-finish-load", () => {
+// mainWindow.webContents.once("devtools-opened", () => {
+// mainWindow.focus();
+// });
+// mainWindow.webContents.openDevTools();
+// });
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
@@ -88,6 +96,7 @@ const createWindow = async () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
+
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {
@@ -109,6 +118,15 @@ const createWindow = async () => {
     shell.openExternal(url);
   });
 
+  // if (process.env.NODE_ENV === 'development') {
+  //   mainWindow.webContents.on('did-frame-finish-load', () => {
+  //     mainWindow.webContents.once('devtools-opened', () => {
+  //       mainWindow.focus();
+  //     });
+  //     mainWindow.webContents.openDevTools();
+  //   });
+  // }
+
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
@@ -126,10 +144,21 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.whenReady().then(createWindow).catch(console.log);
+app
+  .whenReady()
+  .then(() => {
+    createWindow();
+    return {};
+  })
+  .catch(console.log);
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) createWindow();
 });
+
+// IPC HANDLERS
+// ipcMain.handle('getStoreValue', (event, key) => {
+//   return eStore.get(key);
+// });
