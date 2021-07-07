@@ -11,13 +11,17 @@ export type SettingsConfig = {
   musicDir: string;
   enableControls: boolean;
   enableSpectrum: boolean;
+  enableInfo: true;
+  enableParticles: boolean;
 };
 
 const initialState: SettingsState = {
   config: {
-    musicDir: 'D:\\Songs\\C.H.S - KAKATTEKOYEAH!!!!',
+    musicDir: 'D:\\Songs\\かめりあ(Camellia) - U.U.F.O (mp3)',
     enableControls: true,
     enableSpectrum: true,
+    enableInfo: true,
+    enableParticles: true,
   },
 };
 

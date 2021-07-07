@@ -19,7 +19,7 @@ export const infoToast = (desc: string) => {
     title: 'Info',
     description: `${desc}`,
     status: 'info',
-    duration: 9000,
+    duration: 3000,
     isClosable: true,
     position: pos,
   });

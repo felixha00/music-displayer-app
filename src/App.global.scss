@@ -45,9 +45,9 @@ body {
   -moz-filter: blur(5px);
   -o-filter: blur(5px);
   -ms-filter: blur(5px);
-  filter: blur(5px) brightness(0.3);
-  animation: myanim 360s infinite;
-  -webkit-animation: myanim 360s infinite;
+  filter: blur(6px) brightness(0.3);
+  animation: myanim 240s cubic-bezier(0.24, 0, 0.86, 1) infinite;
+  -webkit-animation: myanim 240s cubic-bezier(0.24, 0, 0.86, 1) infinite;
 }
 
 .player-details-type {
@@ -77,6 +77,16 @@ div[role='progressbar'] {
   background-color: transparent !important;
 }
 
+.flex-absolute-box {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 @keyframes myanim {
   0% {
     background-position: 0 100%;
@@ -88,6 +98,25 @@ div[role='progressbar'] {
     background-position: 0 100%;
   }
 }
+
+// @keyframes myanim {
+//   0% {
+//     background-position: 0 0%;
+//     opacity: 0%;
+//   }
+//   5% {
+//     background-position: 0 5%;
+//     opacity: 100%;
+//   }
+//   95% {
+//     background-position: 0 95%;
+//     opacity: 100%;
+//   }
+//   100% {
+//     background-position: 0 100%;
+//     opacity: 0%;
+//   }
+// }
 
 @-webkit-keyframes myanim
 /* Safari and Chrome */ {

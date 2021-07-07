@@ -14,3 +14,5 @@ export interface ISong {
   year: number | undefined;
   songPath: string;
 }
+
+export type LoadingTypes = 'player' | 'app' | 'song';

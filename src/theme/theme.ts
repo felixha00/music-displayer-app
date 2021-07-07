@@ -12,6 +12,11 @@ const theme = extendTheme(
   }),
   {
     components: {
+      Text: {
+        baseStyle: {
+          fontSize: 'sm',
+        },
+      },
       FormLabel: {
         baseStyle: {
           fontSize: '14px',

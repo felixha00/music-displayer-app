@@ -13,9 +13,7 @@ import { usePalette } from 'react-palette';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../app/store/store';
 
-interface Props {}
-
-const NextSongBadge = (props: Props) => {
+const NextSongBadge = () => {
   const { next } = useSelector((state: RootState) => ({
     next: state.player.next,
   }));
@@ -31,18 +29,20 @@ const NextSongBadge = (props: Props) => {
         <Spacer />
 
         {next ? (
-          <>
+          <Box display="flex" alignItems="center">
             <AspectRatio width="25px" ratio={1}>
               <Image borderRadius="9999px" src={next.image} />
             </AspectRatio>
-            <Text textAlign="right" fontSize="xs">
-              <span style={{ fontWeight: 'bold' }}>{next?.title}</span> -{' '}
-              {next?.artist} on{' '}
-              <span style={{ color: `${data.lightVibrant}` }}>
+            <Text textAlign="right" fontSize="xs" ml={2}>
+              <span style={{ fontWeight: 'bold' }}>{next?.title}</span> by{' '}
+              {next?.artist}, on{' '}
+              <span
+                style={{ color: `${data.lightVibrant}`, fontWeight: 'bold' }}
+              >
                 {next?.album}
               </span>
             </Text>
-          </>
+          </Box>
         ) : (
           <CircularProgress isIndeterminate size={4} color="white" />
         )}

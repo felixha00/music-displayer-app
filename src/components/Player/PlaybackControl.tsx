@@ -21,7 +21,7 @@ import {
   RiShuffleFill,
 } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
-import playerActions, {
+import {
   setVol,
   shuffleQueue,
   togglePlay,
@@ -43,9 +43,6 @@ const PlaybackControl = (props: Props) => {
     player: state.player,
   }));
 
-  if (playerRef.current === undefined) {
-    return null;
-  }
   const handlePlayPause = () => {
     if (playerRef.current !== undefined) {
       if (player.playing) {
@@ -66,7 +63,13 @@ const PlaybackControl = (props: Props) => {
   };
 
   const handlePrev = () => {
-    props.onPrev();
+    if (playerRef.current !== undefined) {
+      if (playerRef.current.audioEl.current.currentTime > 3) {
+        playerRef.current.audioEl.current.currentTime = 0;
+      } else if (player.songIndex) {
+        props.onPrev();
+      }
+    }
   };
 
   const handleVolChange = (n: number) => {
@@ -86,14 +89,16 @@ const PlaybackControl = (props: Props) => {
           isRound
           as={RiSkipBackMiniFill}
           onClick={handlePrev}
+          isDisabled={player.songIndex === 0}
           _hover={{ color: 'white' }}
-          color={player.palette.lightVibrant}
+          color="whiteAlpha.800"
         />
         <IconButton
           aria-label={player.playing ? 'pause' : 'play'}
           isRound
           size="md"
-          color={player.palette.lightVibrant}
+          color="whiteAlpha.800"
+          backgroundColor="whiteAlpha.200"
           onClick={handlePlayPause}
           as={player.playing ? RiPauseMiniFill : RiPlayMiniFill}
         />
@@ -101,7 +106,7 @@ const PlaybackControl = (props: Props) => {
           aria-label="next"
           isRound
           variant="unstyled"
-          color={player.palette.lightVibrant}
+          color="whiteAlpha.800"
           _hover={{ color: 'white' }}
           as={RiSkipForwardMiniFill}
           onClick={handleNext}
@@ -137,9 +142,13 @@ const PlaybackControl = (props: Props) => {
               pl={4}
               pr={5}
             >
+              {}
               <Slider
                 aria-label="slider-ex-3"
-                defaultValue={playerRef.current.audioEl.current.volume * 100}
+                defaultValue={
+                  playerRef.current &&
+                  playerRef.current.audioEl.current.volume * 100
+                }
                 onChange={handleVolChange}
                 onChangeEnd={handleVolChangeEnd}
                 orientation="horizontal"

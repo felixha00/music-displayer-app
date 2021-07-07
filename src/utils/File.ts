@@ -5,6 +5,7 @@ import _ from 'lodash';
 import store from '../app/store/store';
 import { ISong } from './types';
 import main from '../playlists/main-playlist.json';
+import glob from 'glob';
 
 export const parseBase64 = (format: string, data: string) => {
   return `data:${format};base64,${data}`;
@@ -38,12 +39,31 @@ export const formatMetadata = (
   return songData;
 };
 
+export const formatMetadataNoCover = (
+  metadata: mm.IAudioMetadata,
+  songPath: string
+): ISong => {
+  const { common, format } = metadata;
+
+  const songData = {
+    title: common.title,
+    album: common.album,
+    artist: common.artist,
+    length: format.duration,
+    image: undefined,
+    bpm: common.bpm,
+    year: common.year,
+    songPath,
+  };
+
+  return songData;
+};
+
 export const formatMetadataForPlaylist = (
   metadata: mm.IAudioMetadata,
   songPath: string
 ) => {
   const { common, format } = metadata;
-  const { picture } = common;
 
   const songData = {
     title: common.title,
@@ -63,33 +83,8 @@ export const getMetadata = async (songPath: string): Promise<any> => {
   // };
   try {
     const metadata = await mm.parseFile(songPath, {});
-
     const parsedSongData = formatMetadata(metadata, songPath);
     return parsedSongData;
-
-    // Let's try to define something with what we got so far...
-    // const parsedData = parseMusicMetadata(data, trackPath);
-
-    // const metadata: Track = {
-    //   ...defaultMetadata,
-    //   ...parsedData,
-    //   path: trackPath,
-    // };
-
-    // metadata.loweredMetas = getLoweredMeta(metadata);
-
-    // Let's try another wat to retrieve a track duration
-    // if (metadata.duration < 0.5) {
-    //   try {
-    //     metadata.duration = await getAudioDuration(trackPath);
-    //   } catch (err) {
-    //     console.warn(
-    //       `An error occured while getting ${trackPath} duration: ${err}`
-    //     );
-    //   }
-    // }
-
-    // return metadata;
   } catch (err) {
     console.warn(`An error occured while reading ${songPath} id3 tags: ${err}`);
 
@@ -97,10 +92,13 @@ export const getMetadata = async (songPath: string): Promise<any> => {
   }
 };
 
-/*
- * READS ALL FILES IN DIRECTORY RECURSIVELY
+/**
+ * Reads all files in directory recursively
+ * @param startPath
+ * @param filter
+ * @param found
+ * @returns
  */
-
 export const readAllInDir = (
   startPath: string,
   filter: string,
@@ -125,6 +123,53 @@ export const readAllInDir = (
   });
 };
 
+/**
+ * Finds all .mp3 in a directory using glob
+ * @param startPath Root of path to search from
+ * @returns Array of file paths
+ */
+export const globRead = async (startPath: string) =>
+  glob(`${startPath}/**/*.mp3`, {}, (err, files: Array<string>) => {
+    console.log(files);
+    return files;
+  });
+// glob.sync(`${startPath}/**/*.mp3`, {});
+
+/**
+ * Finds all .mp3 in a directory using glob, and writes the parsed metdata into a .json
+ * @param startPath Root of path to search from
+ * @returns Array of file paths
+ */
+export const scanDir = (startPath: string) => {
+  glob(`${startPath}/**/*.mp3`, {}, async (err, files: Array<string>) => {
+    const stream = fs.createWriteStream('dir.json', { flags: 'a' });
+    stream.on('open', async function (fd) {
+      stream.write('[');
+
+      for (let i = 0; i < files.length; i += 1) {
+        // await will ensure the metadata parsing is completed before we move on to the next file
+        const metadata = await mm.parseFile(files[i], { skipCovers: true });
+        const formatted = JSON.stringify(
+          formatMetadataNoCover(metadata, files[i]),
+          null,
+          2
+        );
+
+        stream.write(`${formatted},`);
+      }
+      stream.write(']');
+      stream.close();
+    });
+  });
+};
+
+export const readLibrary = (fn: (songs: Array<string>) => any) => {
+  fs.readFile('dir.json', 'utf8', function (err, data) {
+    if (err) throw err;
+    fn(JSON.parse(data));
+  });
+};
+
 export const readAllandParse = async (
   startPath: string,
   filter: string,
@@ -139,38 +184,13 @@ export const readAllandParse = async (
     const stat = fs.lstatSync(filename);
 
     if (stat.isDirectory()) {
-      console.log(filename);
       readAllandParse(filename, filter, found);
     } else if (filename.indexOf(filter) >= 0) {
       found.push(filename);
-      // await mm
-      //   .parseFile(filename)
-      //   .then((tags) => {
-      //     return formatMetadata(tags, filename);
-      //   })
-      //   .then((metadata) => {
-      //     fs.close()
-      //     return found.push(metadata);
-      //   })
-      //   .catch((err) => {});
-      // resolve(
-      //   found.push(
-      //     mm
-      //       .parseFile(filename)
-      //       .then((tags) => {
-      //         return formatMetadata(tags, filename);
-      //       })
-      //       .then((metadata) => {
-      //         return metadata;
-      //       })
-      //       .catch((err) => {})
-      //   )
-      // );
     }
   }
 };
 
-const m: Array<ISong> = [];
 export const parseFiles = (audioFiles) => {
   const audioFile = audioFiles.shift();
 
@@ -214,34 +234,34 @@ export const function2 = async () => {
       return console.log('h');
     })
     .catch(() => {});
-  //Promise.resolve();
 };
 
-export const parsePlaylist = () => {
-  let n = [];
-  fs.readFile('append.txt', 'utf8', (err, fileStr) => {
-    const playlistData = JSON.parse(fileStr);
-    const reduced = main.map((song) => {
-      return {
-        trackName: song['Track Name'],
-        albumName: song['Album Name'],
-      };
-    });
+export const parsePlaylist = async () => {
+  const matchedSongs: Array<string> = [];
 
-    reduced.forEach((song) => {
-      const match = _.find(playlistData, (data) => {
-        return data.title === song.trackName;
+  return new Promise((resolve, reject) => {
+    fs.readFile('append.txt', 'utf8', (err, fileStr) => {
+      const playlistData = JSON.parse(fileStr);
+      const reduced = main.map((song) => {
+        return {
+          trackName: song['Track Name'],
+          albumName: song['Album Name'],
+        };
       });
 
-      if (match !== undefined) {
-        n.push(match.songPath);
-      }
+      reduced.forEach((song) => {
+        const match = _.find(playlistData, (data) => {
+          return data.title === song.trackName;
+        });
+
+        if (match !== undefined) {
+          matchedSongs.push(match.songPath);
+        }
+      });
+      return resolve(matchedSongs);
+      //console.log(_.shuffle(n.slice(1, 50)));
     });
-
-    console.log(_.shuffle(n.slice(1, 50)));
   });
-
-  return n;
 };
 
 export const findAllSongPathsFromDir = (
@@ -281,21 +301,5 @@ export const findAllSongPathsFromDir = (
       });
   });
 };
-
-export const getAllMetadataFromSongPaths = (songPaths: Array<string>) => {
-  const promises = [];
-  const foundSongsMetadata: Array<ISong> = [];
-  for (let i = 0; i < songPaths.length; i += 1) {
-    promises.push(mm.parseFile(songPaths[i]));
-  }
-
-  return Promise.all(promises).then((tags) => {
-    for (let j = 0; j < tags.length; j += 1) {
-      foundSongsMetadata.push(formatMetadata(tags[j], songPaths[j]));
-    }
-    return foundSongsMetadata;
-  });
-};
-
 export const convertJSONtoPlaylist = () => {};
 export default {};

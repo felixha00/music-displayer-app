@@ -1,5 +1,6 @@
-import { Box, CircularProgress } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import React from 'react';
+import MoonLoader from 'react-spinners/MoonLoader';
 
 interface Props {
   loading: boolean;
@@ -23,7 +24,7 @@ const Loading = (props: Props) => {
       alignItems="center"
       justifyContent="center"
     >
-      <CircularProgress isIndeterminate capIsRound />
+      <MoonLoader color={'#ffffff'} />
     </Box>
   );
 };

@@ -1,4 +1,6 @@
 {
   "enableControls": "Enable Controls",
-  "enableSpectrum": "Enable Spectrum"
+  "enableSpectrum": "Enable Spectrum",
+  "enableInfo": "Enable Info Button",
+  "enableParticles": "Enable ParticleJS"
 }
