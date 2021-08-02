@@ -1,6 +1,5 @@
 import * as fs from 'graceful-fs';
 import * as path from 'path';
-import main from '../playlists/main-playlist.json';
 import _ from 'lodash';
 import {
   parseHugeFileList,

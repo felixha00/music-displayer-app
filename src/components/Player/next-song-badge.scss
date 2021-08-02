@@ -1,0 +1,23 @@
+.player-next-song-badge::before {
+  background: #000;
+  filter: blur(6px) brightness(0.3);
+}
+
+.player-next-song-badge-arrow {
+  color: white;
+  margin-left: 0px;
+  animation: margin 1s cubic-bezier(0.24, 0, 0.86, 1) infinite;
+  -webkit-animation: margin 1s cubic-bezier(0.24, 0, 0.86, 1) infinite;
+}
+
+@keyframes margin {
+  0% {
+    margin-left: 0px;
+  }
+  50% {
+    margin-left: 2px;
+  }
+  100% {
+    margin-left: 0px;
+  }
+}

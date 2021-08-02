@@ -1,0 +1,19 @@
+// Colors
+$bg-color: rgba(0, 0, 0, 0);
+$dot-color: white;
+
+// Dimensions
+$dot-size: 1.25px;
+$dot-space: 22px;
+.bass-gradient-dots {
+  //   background: linear-gradient(
+  //         90deg,
+  //         $bg-color ($dot-space - $dot-size),
+  //         transparent 1%
+  //       )
+  //       center,
+  //     linear-gradient($bg-color ($dot-space - $dot-size), transparent 1%) center,
+  //     $dot-color;
+  //   background-size: $dot-space $dot-space;
+  background-image: radial-gradient(black 1px, transparent 0);
+}

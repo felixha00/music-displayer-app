@@ -1,4 +1,5 @@
 import { extendTheme, ThemeConfig, withDefaultSize } from '@chakra-ui/react';
+import { mode } from '@chakra-ui/theme-tools';
 
 const config: ThemeConfig = {
   initialColorMode: 'dark',
@@ -11,12 +12,43 @@ const theme = extendTheme(
     components: ['Button', 'Input'],
   }),
   {
+    colors: {
+      theme: {
+        50: '#141214',
+      },
+    },
     components: {
+      Drawer: {
+        // setup light/dark mode component defaults
+        baseStyle: (props) => ({
+          dialog: {
+            bg: mode('gray.100', '#141214')(props),
+          },
+        }),
+      },
+      Modal: {
+        // setup light/dark mode component defaults
+        baseStyle: (props) => ({
+          dialog: {
+            bg: mode('gray.100', '#141214')(props),
+          },
+        }),
+        defaultProps: {
+          isCentered: true,
+        },
+      },
+      Menu: {
+        baseStyle: (props) => ({
+          bg: mode('gray.100', 'black')(props),
+        }),
+      },
+
       Text: {
         baseStyle: {
           fontSize: 'sm',
         },
       },
+      Heading: {},
       FormLabel: {
         baseStyle: {
           fontSize: '14px',
@@ -27,15 +59,26 @@ const theme = extendTheme(
           fontSize: '14px',
         },
       },
+      TabPanel: {
+        baseStyle: {
+          padding: 0,
+        },
+        defaultProps: {
+          p: 0,
+        },
+      },
     },
     fonts: {
       heading: 'Inter',
       body: 'Inter',
     },
     styles: {
-      body: {
-        background: 'black',
-      },
+      global: (props) => ({
+        body: {
+          color: mode('gray.800', 'whiteAlpha.900')(props),
+          bg: mode('gray.100', '#141214')(props),
+        },
+      }),
     },
     colors: {
       custom: {},

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import {
   Box,
   Flex,
@@ -9,58 +9,43 @@ import {
   ButtonGroup,
   Drawer,
   DrawerBody,
-  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
   Button,
-  Input,
   IconButton,
   Icon,
-  Divider,
   Text,
-  Image,
+  SlideFade,
 } from '@chakra-ui/react';
-
+import Marquee from 'react-fast-marquee';
 import {
   RiSettings2Line,
   RiSpotifyFill,
-  RiGithubFill,
   RiInformationFill,
 } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import MusicPlayer from '../components/MusicPlayer';
-import { spotifyLoginURI } from '../config/spotify';
 import store, { RootState } from '../app/store/store';
 import SettingsForm from '../components/Settings/SettingsForm';
-import {
-  loadingSelector,
-  loadingSetter,
-  setNextSong,
-  setQueue,
-  setSong,
-  shuffleQueue,
-} from '../app/store/actions/playerActions';
-import {
-  findAllSongPathsFromDir,
-  parseFiles,
-  readAllandParse,
-  parseFiles2,
-  function2,
-  parsePlaylist,
-  scanDir,
-  readLibrary,
-} from '../utils/file';
-import { ipcRenderer } from 'electron';
+import { loadingSelector } from '../app/store/actions/playerActions';
+import { function2, parsePlaylist, scanDir, readLibrary } from '../utils/file';
 import Loading from './Loading';
 import ActionTypes from '../app/store/actionTypes';
-import { remote } from 'electron';
-import logo from '../../assets/logo.svg';
-import Particles from 'react-particles-js';
+
 import { generateParticleJS } from '../utils/fn';
 import LibraryDrawer from '../components/Library/LibraryDrawer';
+import InfoDrawer from '../components/Drawers/InfoDrawer';
+import { convertPathsToPlaylist } from '../utils/playlists';
+import ExtraGIFDisplayer from '../components/ExtraGIFDisplayer';
+import {
+  MotionBox,
+  MotionHeading,
+} from '../components/Wrappers/FramerComponents';
+import SongMarquee from '../components/Main/SongMarquee';
+import SongBackgroundText from '../components/Main/SongBackgroundText';
 
 // const appVersion = require('electron').remote.app.getVersion();
 function SettingsDrawer() {
@@ -69,7 +54,15 @@ function SettingsDrawer() {
 
   const openSpotifyAuthWindow = () => {};
   const handleParsePlaylist = () => {
-    parsePlaylist();
+    parsePlaylist().then((h) => {
+      console.log(h);
+    });
+  };
+
+  const x = () => {
+    parsePlaylist().then((h) => {
+      convertPathsToPlaylist(h);
+    });
   };
   const handleJSONToPlaylist = async () => {
     let h = [];
@@ -95,13 +88,7 @@ function SettingsDrawer() {
         isRound
         onClick={onOpen}
       />
-      <Drawer
-        isOpen={isOpen}
-        placement="right"
-        size="xs"
-        onClose={onClose}
-        finalFocusRef={btnRef}
-      >
+      <Drawer isOpen={isOpen} placement="right" size="xs" onClose={onClose}>
         <DrawerOverlay />
         <DrawerContent>
           <DrawerHeader>
@@ -121,11 +108,11 @@ function SettingsDrawer() {
               >
                 Sign Into Spotify
               </Button>
-
               <SettingsForm />
               <Button onClick={handleJSONToPlaylist}>Convert Playlist</Button>
               <Button onClick={handleParsePlaylist}>Parse Playlist</Button>
               <Button onClick={handleGlobRead}>GlobRead</Button>
+              <Button onClick={x}>Convert files to new playlist</Button>
               <Button onClick={readLib}>Read Library</Button>
             </VStack>
           </DrawerBody>
@@ -136,75 +123,76 @@ function SettingsDrawer() {
 }
 
 const Home = () => {
-  const dispatch = useDispatch();
-  // let player;
-  // store.subscribe(() => {
-  //   const { player } = store.getState();
-  // });
   const [particleParams, setParticleParams] = useState('#ffffff');
-  const [appLoading, setAppLoading] = useState(false);
   const { player, settings } = useSelector((state: RootState) => ({
     player: state.player,
     settings: state.settings,
   }));
+  const { current, queue, priorityQueue } = player;
+  const { title, artist, album } = current || {};
+  const [compressedBg, setCompressedBg] = useState('');
 
+  //  useEffect(() => {
+  //    imageCompression.
+  //  },[])
   useEffect(() => {
-    setParticleParams(generateParticleJS(player.palette.vibrant));
+    setParticleParams(generateParticleJS(player.palette.vibrant || '#ffffff'));
   }, [player.palette]);
 
   useEffect(() => {
-    loadingSetter('app', true);
-    setQueue(settings.config.musicDir, 50);
-    // findAllSongPathsFromDir(settings.config.musicDir);
-  }, [settings.config.musicDir]);
+    // if (player.current === null) {
+    //   loadingSetter('song', true);
+    //   // setSong(_.head(player.queue));
+    //   gotoNextSong();
+    // }
+    // setSong(player.songIndex);
+    // setNextSong(player.songIndex + 1);
+  }, []);
 
-  useEffect(() => {
-    loadingSetter('song', true);
-    setSong(player.queue[player.songIndex] || '');
-    setNextSong(player.queue[player.songIndex + 1]);
-  }, [player.queue, player.songIndex]);
-
-  if (loadingSelector('app') || player.current === null) {
-    return <Loading loading={loadingSelector('app')} />;
-  }
+  // useEffect(() => {
+  //   setSong(player.songIndex);
+  // }, [player.queue]);
+  // const renderExtraGIFDisplayer = useCallback(() => {
+  //   return <ExtraGIFDisplayer key={} copies={1} scale />;
+  // }, []);
 
   return (
     <>
-      {settings.config.enableParticles && (
-        <Particles
-          style={{ position: 'absolute', zIndex: '0' }}
-          params={particleParams}
+      {player.current && (
+        <Box
+          className="album-art-bg"
+          id="album-art-bg"
+          key={player.current.songPath}
+          bgImage={player.current?.image}
         />
       )}
-      <Box
-        className="home-main"
-        height="100vh"
-        padding={16}
-        _before={{ backgroundImage: player.current.image }}
+
+      <MotionBox
+        h="100%"
+        display="flex"
+        flexDir="column"
+        borderBottom={`4px solid ${player.palette.vibrant}`}
+        key={player.current?.title}
       >
-        <Flex flexDirection="column" height="100%">
-          <Flex alignItems="center">
+        <SongBackgroundText />
+        <ExtraGIFDisplayer
+          height="50%"
+          // key={player.current?.title}
+          copies={1}
+        />
+        <Flex
+          padding={{ base: 4, md: 8, lg: 16 }}
+          flexDirection="column"
+          height="100%"
+        >
+          <Flex alignItems="center" zIndex="99">
             {settings.config.enableInfo && (
               <>
                 <ButtonGroup>
-                  <IconButton
-                    aria-label="Github"
-                    variant="ghost"
-                    isRound
-                    size="lg"
-                    icon={<RiInformationFill />}
-                  />
+                  <InfoDrawer />
                 </ButtonGroup>
-                {/* <Image width="150px" src={logo} /> */}
-                <Text fontSize="xs">{`${remote.app.getName()} ${remote.app.getVersion()}`}</Text>
               </>
             )}
-
-            <Spacer />
-            <marquee>
-              {' '}
-              <Text size="md">pepega</Text>
-            </marquee>
 
             <Spacer />
             <LibraryDrawer />
@@ -215,18 +203,14 @@ const Home = () => {
             <MusicPlayer />
           </Box>
         </Flex>
-      </Box>
+        <SongMarquee />
+      </MotionBox>
     </>
   );
 };
 
-// const mapStateToProps = (state) => ({
-//   player: state.player,
+// ipcRenderer.on('show-toast', (evt, message) => {
+//   console.log(message); // Returns: {'SAVED': 'File Saved'}
 // });
-
-// const mapDispatchToProps = {};
-ipcRenderer.on('show-toast', (evt, message) => {
-  console.log(message); // Returns: {'SAVED': 'File Saved'}
-});
 
 export default Home;

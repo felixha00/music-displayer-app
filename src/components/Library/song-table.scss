@@ -1,5 +1,17 @@
 .song-table {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  // th:last-child {
+  //   text-align: right !important;
+  // }
+
+  td,
   th {
-    text-align: right !important;
+    border-color: transparent !important;
+  }
+
+  th {
+    padding-left: 0px;
   }
 }

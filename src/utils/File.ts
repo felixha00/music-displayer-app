@@ -1,32 +1,48 @@
-import * as fs from 'fs';
+import * as fs from 'graceful-fs';
 import * as mm from 'music-metadata';
 import path from 'path';
 import _ from 'lodash';
 import store from '../app/store/store';
 import { ISong } from './types';
-import main from '../playlists/main-playlist.json';
 import glob from 'glob';
+import { promisify } from 'util';
+import imageCompression from 'browser-image-compression';
+import { infoToast } from '../components/Toasts/generateToasts';
 
 export const parseBase64 = (format: string, data: string) => {
   return `data:${format};base64,${data}`;
 };
 
-export const formatMetadata = (
+export const formatMetadata = async (
   metadata: mm.IAudioMetadata,
   songPath: string
-): ISong => {
+): Promise<ISong> => {
   const { common, format } = metadata;
-  const { picture } = common;
+  const { picture, track } = common;
   let b64img: string;
   if (picture) {
     b64img = parseBase64(picture[0].format, picture[0].data.toString('base64'));
+    const file: File = await imageCompression.getFilefromDataUrl(
+      b64img,
+      'test'
+    );
+    const compressed = await imageCompression(file, {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 500,
+      useWebWorker: true,
+    });
+    b64img = await imageCompression.getDataUrlFromFile(compressed);
   } else {
+    // let img = fs.readFileSync('../assets/default-playlist-img.png', 'base64');
+    // console.log(img);
+    // b64img = img;
     b64img =
       'https://www.gothiccountry.se/images/pictures2/no_album_art__no_cover.jpg';
   }
 
+  console.log('LULW');
   const songData = {
-    title: common.title,
+    title: common.title || path.basename(songPath, path.extname(songPath)),
     album: common.album,
     artist: common.artist,
     length: format.duration,
@@ -34,6 +50,8 @@ export const formatMetadata = (
     bpm: common.bpm,
     year: common.year,
     songPath,
+    genre: common.genre,
+    track: common.track.no,
   };
 
   return songData;
@@ -53,6 +71,7 @@ export const formatMetadataNoCover = (
     image: undefined,
     bpm: common.bpm,
     year: common.year,
+    track: common.track.no,
     songPath,
   };
 
@@ -68,13 +87,25 @@ export const formatMetadataForPlaylist = (
   const songData = {
     title: common.title,
     album: common.album,
+    length: format.duration,
+    artist: common.artist,
     songPath,
   };
 
   return songData;
 };
 
-export const getMetadata = async (songPath: string): Promise<any> => {
+/**
+ * Gets
+ * @param songPath
+ * @param skipCovers
+ * @returns
+ */
+export const getMetadata = async (
+  songPath: string,
+  skipCovers = false
+): Promise<any> => {
+  console.log(songPath);
   // const defaultMetadata = getDefaultMetadata();
 
   // const basicMetadata: Track = {
@@ -82,9 +113,35 @@ export const getMetadata = async (songPath: string): Promise<any> => {
   //   path: trackPath,
   // };
   try {
-    const metadata = await mm.parseFile(songPath, {});
-    const parsedSongData = formatMetadata(metadata, songPath);
+    if (!songPath) {
+      throw new Error('Song Path is not defined');
+    }
+    const metadata = await mm.parseFile(songPath, { skipCovers });
+    const parsedSongData = await formatMetadata(metadata, songPath);
     return parsedSongData;
+  } catch (err) {
+    console.warn(`An error occured while reading ${songPath} id3 tags: ${err}`);
+
+    return {};
+  }
+};
+
+export const getMetadataNoFormat = async (
+  songPath: string,
+  skipCovers = false
+): Promise<any> => {
+  // const defaultMetadata = getDefaultMetadata();
+
+  // const basicMetadata: Track = {
+  //   ...defaultMetadata,
+  //   path: trackPath,
+  // };
+  try {
+    if (!songPath) {
+      throw new Error('Song Path is not defined');
+    }
+    const metadata = await mm.parseFile(songPath, { skipCovers });
+    return metadata;
   } catch (err) {
     console.warn(`An error occured while reading ${songPath} id3 tags: ${err}`);
 
@@ -128,11 +185,12 @@ export const readAllInDir = (
  * @param startPath Root of path to search from
  * @returns Array of file paths
  */
-export const globRead = async (startPath: string) =>
+export const globRead = async (startPath: string) => {
   glob(`${startPath}/**/*.mp3`, {}, (err, files: Array<string>) => {
     console.log(files);
     return files;
   });
+};
 // glob.sync(`${startPath}/**/*.mp3`, {});
 
 /**
@@ -140,10 +198,12 @@ export const globRead = async (startPath: string) =>
  * @param startPath Root of path to search from
  * @returns Array of file paths
  */
-export const scanDir = (startPath: string) => {
+export const scanDir = (startPath: string, cb: () => void) => {
+  // fs.writeFile('dir.json', '', () => {
   glob(`${startPath}/**/*.mp3`, {}, async (err, files: Array<string>) => {
     const stream = fs.createWriteStream('dir.json', { flags: 'a' });
-    stream.on('open', async function (fd) {
+
+    stream.on('open', async (fd) => {
       stream.write('[');
 
       for (let i = 0; i < files.length; i += 1) {
@@ -154,19 +214,53 @@ export const scanDir = (startPath: string) => {
           null,
           2
         );
-
-        stream.write(`${formatted},`);
+        if (i !== files.length - 1) {
+          stream.write(`${formatted},`);
+        }
       }
       stream.write(']');
       stream.close();
+      cb();
     });
   });
+  // });
 };
 
 export const readLibrary = (fn: (songs: Array<string>) => any) => {
-  fs.readFile('dir.json', 'utf8', function (err, data) {
-    if (err) throw err;
-    fn(JSON.parse(data));
+  fs.readFile('dir.json', 'utf8', (err, data) => {
+    try {
+      if (err) throw err;
+
+      fn(JSON.parse(data));
+    } catch (error) {
+      fn([]);
+    }
+  });
+};
+
+export const rescanLibrary = (
+  startPath: string,
+  cb: (nMissing: number, nDeleted: number) => void
+) => {
+  // infoToast('Rescanning Libary...');
+  glob(`${startPath}/**/*.mp3`, {}, (err, files: Array<string>) => {
+    fs.readFile('dir.json', 'utf8', async (err, data) => {
+      const existingLib: Array<ISong> = JSON.parse(data);
+      const songPaths = existingLib.map(({ songPath }) => songPath);
+      const missing = files.filter((filePath) => !songPaths.includes(filePath));
+      const deleted = songPaths.filter((filePath) => !files.includes(filePath));
+      for (let i = 0; i < missing.length; i += 1) {
+        const metadata = await mm.parseFile(missing[i], { skipCovers: true });
+        existingLib.push(formatMetadataNoCover(metadata, missing[i]));
+      }
+      for (let j = 0; j < deleted.length; j += 1) {
+        const ind = songPaths.indexOf(deleted[j]);
+        existingLib.splice(ind, 1);
+      }
+      fs.writeFile('dir.json', JSON.stringify(existingLib), () => {
+        cb(missing.length, deleted.length);
+      });
+    });
   });
 };
 
@@ -189,21 +283,6 @@ export const readAllandParse = async (
       found.push(filename);
     }
   }
-};
-
-export const parseFiles = (audioFiles) => {
-  const audioFile = audioFiles.shift();
-
-  if (audioFile) {
-    return mm.parseFile(audioFile).then((metadata) => {
-      // Do great things with the metadata
-      //m.push(formatMetadata(metadata, audioFile));
-      console.log(formatMetadata(metadata, audioFile));
-      return parseFiles(audioFiles); // process rest of the files AFTER we are finished
-    });
-  }
-
-  return Promise.resolve();
 };
 
 export const parseFiles2 = async (audioFiles) => {
@@ -302,4 +381,3 @@ export const findAllSongPathsFromDir = (
   });
 };
 export const convertJSONtoPlaylist = () => {};
-export default {};

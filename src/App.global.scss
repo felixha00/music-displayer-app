@@ -4,11 +4,17 @@
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('/src/styles/css/clash-display.css');
 @font-face {
   font-family: 'Computer Modern';
   src: url(fonts/cmunrm.ttf);
 }
-
+@import './components/Library/song-table.scss';
+@import './components/Library/library-drawer.scss';
+@import './components/Player/next-song-badge.scss';
+@import './views/home.scss';
+@import './components/Visualizer/visualizer.scss';
+@import './components/music-player.scss';
 body {
   position: relative;
   height: 100vh;
@@ -18,6 +24,45 @@ body {
   align-items: center;
 }
 
+.album-art-bg {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: -2;
+  display: block;
+  background-color: black;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000;
+  -webkit-filter: blur(5px);
+  -moz-filter: blur(5px);
+  -o-filter: blur(5px);
+  -ms-filter: blur(5px);
+  filter: blur(6px) brightness(0.4);
+
+  // animation: bg-wobble 5s infinite;
+  // -webkit-animation: bg-wobble 5s infinite;
+  animation: myanim 240s cubic-bezier(0.24, 0, 0.86, 1) infinite;
+  -webkit-animation: myanim 240s cubic-bezier(0.24, 0, 0.86, 1) infinite;
+
+  &::before {
+    left: -0.5vh;
+    filter: brightness(115%) hue-rotate(10deg);
+  }
+
+  &::after {
+    left: 0.5vh;
+    filter: brightness(115%) hue-rotate(270deg);
+  }
+}
 .home-main {
   /* background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
     url('https://f4.bcbits.com/img/a2312567325_10.jpg'); */
@@ -32,7 +77,7 @@ body {
   right: 0;
   top: 0;
   bottom: 0;
-  z-index: -1;
+  z-index: -2;
   display: block;
   background-color: black;
   width: 100%;
@@ -46,8 +91,10 @@ body {
   -o-filter: blur(5px);
   -ms-filter: blur(5px);
   filter: blur(6px) brightness(0.3);
-  animation: myanim 240s cubic-bezier(0.24, 0, 0.86, 1) infinite;
-  -webkit-animation: myanim 240s cubic-bezier(0.24, 0, 0.86, 1) infinite;
+  animation: bg-wobble 10s linear infinite;
+  -webkit-animation: bg-wobble 10s linear infinite;
+  // animation: myanim 240s cubic-bezier(0.24, 0, 0.86, 1) infinite;
+  // -webkit-animation: myanim 240s cubic-bezier(0.24, 0, 0.86, 1) infinite;
 }
 
 .player-details-type {
@@ -57,7 +104,7 @@ body {
 
 .player-control {
   background-color: black;
-  transition: all 0.5s;
+  // transition: all 0.5s;
 }
 
 .rounded {
@@ -78,6 +125,7 @@ div[role='progressbar'] {
 }
 
 .flex-absolute-box {
+  z-index: -1;
   top: 0;
   bottom: 0;
   left: 0;
@@ -99,6 +147,38 @@ div[role='progressbar'] {
   }
 }
 
+@keyframes bg-wobble {
+  0% {
+    rotate: -5deg;
+  }
+  50% {
+    rotate: 5deg;
+  }
+  100% {
+    rotate: -5deg;
+  }
+  // 0% {
+  //   transform: translateX(0%);
+  // }
+  // 15% {
+  //   transform: translateX(-25%) rotate(-5deg);
+  // }
+  // 30% {
+  //   transform: translateX(20%) rotate(3deg);
+  // }
+  // 45% {
+  //   transform: translateX(-15%) rotate(-3deg);
+  // }
+  // 60% {
+  //   transform: translateX(10%) rotate(2deg);
+  // }
+  // 75% {
+  //   transform: translateX(-5%) rotate(-1deg);
+  // }
+  // 100% {
+  //   transform: translateX(0%);
+  // }
+}
 // @keyframes myanim {
 //   0% {
 //     background-position: 0 0%;
@@ -117,6 +197,59 @@ div[role='progressbar'] {
 //     opacity: 0%;
 //   }
 // }
+// $anime-time: 8s;
+
+// $box-size: 200px;
+// $clip-distance: 0.05;
+// $clip-size: $box-size * (1 + $clip-distance * 2);
+// $path-width: 2px;
+// $main-color: #69ca62;
+
+// %full-fill {
+//   position: absolute;
+//   top: 0;
+//   bottom: 0;
+//   left: 0;
+//   right: 0;
+// }
+
+// .bb {
+//   @extend %full-fill;
+//   width: $box-size;
+//   height: $box-size;
+//   margin: auto;
+//   color: white;
+//   box-shadow: inset 0 0 0 1px rgba($main-color, 0.5);
+
+//   &::before,
+//   &::after {
+//     @extend %full-fill;
+//     content: '';
+//     z-index: -1;
+//     margin: -1 * $clip-distance * 100%;
+//     box-shadow: inset 0 0 0 $path-width;
+//     animation: clipMe $anime-time linear infinite;
+//   }
+
+//   &::before {
+//     animation-delay: $anime-time * -0.5;
+//   }
+// }
+// @keyframes clipMe {
+//   0%,
+//   100% {
+//     clip: rect(0px, $clip-size, $path-width, 0px);
+//   }
+//   25% {
+//     clip: rect(0px, $path-width, $clip-size, 0px);
+//   }
+//   50% {
+//     clip: rect($clip-size - $path-width, $clip-size, $clip-size, 0px);
+//   }
+//   75% {
+//     clip: rect(0px, $clip-size, $clip-size, $clip-size - $path-width);
+//   }
+// }
 
 @-webkit-keyframes myanim
 /* Safari and Chrome */ {
@@ -129,4 +262,26 @@ div[role='progressbar'] {
   100% {
     background-position: 0 0;
   }
+}
+
+button:focus,
+input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ffffff;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 9999px;
 }

@@ -1,0 +1,26 @@
+.library-drawer {
+  height: -webkit-fill-available;
+  display: flex !important;
+  flex-direction: column;
+
+  > .chakra-tabs__tab-panels {
+    flex-grow: 1;
+
+    > .chakra-tabs__tab-panel {
+      height: 100%;
+
+      .song-table {
+        height: 100%;
+      }
+    }
+  }
+  .chakra-tabs__tab {
+    text-transform: uppercase;
+    padding-left: 0px;
+    padding-right: 0px;
+
+    &:not(:last-child) {
+      margin-right: 1rem;
+    }
+  }
+}

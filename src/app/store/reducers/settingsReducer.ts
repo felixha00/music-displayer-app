@@ -13,6 +13,12 @@ export type SettingsConfig = {
   enableSpectrum: boolean;
   enableInfo: true;
   enableParticles: boolean;
+  enableGIFExtra: boolean;
+  enableShowNext: boolean;
+  enableBassGradient: boolean;
+  enableReactiveTitle: boolean;
+  enableReactiveGradBg: boolean;
+  enableReactiveBgScale: boolean;
 };
 
 const initialState: SettingsState = {
@@ -22,6 +28,12 @@ const initialState: SettingsState = {
     enableSpectrum: true,
     enableInfo: true,
     enableParticles: true,
+    enableGIFExtra: true,
+    enableBassGradient: true,
+    enableShowNext: true,
+    enableReactiveTitle: true,
+    enableReactiveGradBg: true,
+    enableReactiveBgScale: true,
   },
 };
 

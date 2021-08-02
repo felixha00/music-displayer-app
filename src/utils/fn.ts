@@ -20,11 +20,6 @@ export const generateParticleJS = (color: string) => {
         polygon: {
           nb_sides: 3,
         },
-        image: {
-          src: '',
-          width: 100,
-          height: 100,
-        },
       },
       opacity: {
         value: 0.75,
@@ -111,4 +106,25 @@ export const generateParticleJS = (color: string) => {
   };
 };
 
+export const getSongString = (
+  title?: string,
+  artist?: string,
+  album?: string
+) => {
+  let str = '';
+
+  if (title) {
+    str += title;
+  }
+
+  if (artist) {
+    str += ` by ${artist}`;
+  }
+
+  if (album) {
+    str += ` on ${album}`;
+  }
+
+  return str;
+};
 export default {};

@@ -11,13 +11,14 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
+
 // import { eStore } from './app/store/store';
 // const Store = require('electron-store');
-
+const electronReload = require('electron-reload');
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -78,13 +79,18 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     title: 'Showboat',
+    autoHideMenuBar: true,
     show: false,
     width: 800,
     height: 600,
-    icon: getAssetPath('icon.png'),
+    titleBarStyle: 'hidden',
+
+    icon: getAssetPath('showboat-logo.png'),
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
+      nodeIntegrationInWorker: true,
+      // preload: path.join(__dirname, 'preload.js'),
     },
   });
 
@@ -159,6 +165,25 @@ app.on('activate', () => {
 });
 
 // IPC HANDLERS
-// ipcMain.handle('getStoreValue', (event, key) => {
-//   return eStore.get(key);
+
+ipcMain.on('openSongInFolder', (event, args: string) => {
+  shell.showItemInFolder(args.replace(/\//g, '\\'));
+});
+
+ipcMain.on('pickSongFromDevice', (e) => {
+  dialog
+    .showOpenDialog(mainWindow!, {
+      properties: ['openFile', 'multiSelections'],
+      filters: [{ name: 'Music', extensions: ['mp3', 'flac'] }],
+    })
+    .then((res) => {
+      return e.sender.send('onPickSongFromDevice', res.filePaths);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+// ipcMain.on('fetchPlaylistInfo', (event, args: string) => {
+//   console.log(args);
 // });

@@ -5,6 +5,7 @@ import {
   createStore,
 } from '@reduxjs/toolkit';
 import logger from 'redux-logger';
+import audioReducer from './reducers/audioReducer';
 import playerReducer from './reducers/playerReducer';
 import settingsReducer from './reducers/settingsReducer';
 // import Store from 'electron-store';
@@ -12,6 +13,7 @@ import settingsReducer from './reducers/settingsReducer';
 const rootReducer = combineReducers({
   player: playerReducer,
   settings: settingsReducer,
+  audio: audioReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

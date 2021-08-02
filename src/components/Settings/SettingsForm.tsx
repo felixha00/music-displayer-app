@@ -13,7 +13,7 @@ import {
   Box,
   Badge,
 } from '@chakra-ui/react';
-import { Formik, Form, Field, FormikFormProps, FormikProps } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import React, { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ActionTypes from '../../app/store/actionTypes';
@@ -40,23 +40,15 @@ const SettingsForm = (props: Props) => {
 
   const handlePlaylistUpload = (e) => {
     const playlistFile: File = e.currentTarget.files[0];
-    console.log(playlistFile);
     setPlaylist(playlistFile);
   };
   const onSettingsChange = (e) => {
-    // switch (e.target['name']) {
-    //   case 'enableControls':
-    //     dispatch({ type: ActionTypes.SETTINGS_TOGGLE_CONTROLS, payload: e.target['name'] });
-    //     break;
-
-    //   default:
-    //     break;
-    // }
     dispatch({
       type: ActionTypes.SETTINGS_TOGGLE_CONTROLS,
-      payload: e.target['name'],
+      payload: e.target.name,
     });
   };
+
   return (
     <>
       <Formik
@@ -120,7 +112,6 @@ const SettingsForm = (props: Props) => {
           Browse
         </Button>
       </FormControl>
-
       <VStack w="100%">
         {Object.keys(settingsSwitchSchema).map((key) => {
           return (
@@ -139,7 +130,6 @@ const SettingsForm = (props: Props) => {
       </VStack>
 
       <ConvertPlaylistModal />
-      <NewPlaylistModal />
     </>
   );
 };

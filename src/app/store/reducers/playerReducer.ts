@@ -8,11 +8,14 @@ export type PlayerState = {
   palette: PaletteColors;
   playing: boolean;
   queue: Array<string>;
+  priorityQueue: Array<string>;
+  songStack: Array<string>;
   songIndex: number;
   currentTime: number;
   vol: number;
   loading: Array<string>;
-  shuffle: true;
+  shuffle: boolean;
+  modal: boolean;
 };
 
 const initialState: PlayerState = {
@@ -31,15 +34,24 @@ const initialState: PlayerState = {
   palette: {},
   playing: false,
   queue: [],
+  priorityQueue: [],
+  songStack: [],
   songIndex: 0,
   currentTime: 0,
   vol: 0.2,
   loading: [],
   shuffle: true,
+  modal: false,
 };
 
 export default (state = initialState, action: Action): PlayerState => {
   switch (action.type) {
+    case ActionTypes.PLAYER_TOGGLE_MODAL: {
+      return {
+        ...state,
+        modal: !state.modal,
+      };
+    }
     case ActionTypes.PLAYER_SET_SONG: {
       return {
         ...state,
@@ -66,6 +78,39 @@ export default (state = initialState, action: Action): PlayerState => {
         songIndex: 0,
       };
     }
+    case ActionTypes.PLAYER_CLEAR_QUEUE: {
+      return {
+        ...state,
+        queue: [],
+        priorityQueue: [],
+      };
+    }
+    case ActionTypes.PLAYER_APPEND_TO_QUEUE: {
+      const { priority, path } = action.payload;
+      if (!priority) {
+        return {
+          ...state,
+          queue: [...state.queue, path],
+        };
+      }
+      return {
+        ...state,
+        priorityQueue: [...state.priorityQueue, path],
+      };
+      // if (!state.queue.length) {
+      //   return {
+      //     ...state,
+      //     queue: [action.payload] || state.queue,
+      //     songIndex: 0,
+      //   };
+      // }
+      // const newArr = state.queue;
+      // newArr.splice(1, 0, action.payload);
+      // return {
+      //   ...state,
+      //   queue: newArr,
+      // };
+    }
     case ActionTypes.PLAYER_SET_PLAY: {
       return {
         ...state,
@@ -85,15 +130,31 @@ export default (state = initialState, action: Action): PlayerState => {
       };
     }
     case ActionTypes.PLAYER_NEXT_INDEX: {
+      if (state.priorityQueue.length) {
+        const newQueue = [...state.priorityQueue];
+        newQueue.shift();
+        return {
+          ...state,
+          songStack: [...state.songStack, state.priorityQueue[0]],
+          priorityQueue: newQueue,
+        };
+      }
+      const newQueue = [...state.queue];
+      newQueue.shift();
       return {
         ...state,
         songIndex: state.songIndex + 1,
+        songStack: [...state.songStack, state.queue[0]],
+        queue: newQueue,
       };
     }
     case ActionTypes.PLAYER_PREV_INDEX: {
+      const newSongStack = [...state.songStack];
+      newSongStack.pop();
       return {
         ...state,
         songIndex: state.songIndex - 1,
+        songStack: newSongStack,
       };
     }
     case ActionTypes.PLAYER_SET_LOADING: {

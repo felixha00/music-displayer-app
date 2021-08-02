@@ -1,6 +1,12 @@
 {
+  "enableShowNext": "Enable Next Song Indicator",
   "enableControls": "Enable Controls",
   "enableSpectrum": "Enable Spectrum",
   "enableInfo": "Enable Info Button",
-  "enableParticles": "Enable ParticleJS"
+  "enableParticles": "Enable ParticleJS",
+  "enableGIFExtra": "Enable GIF Extra",
+  "enableBassGradient": "Enable Reactive Bass Gradient",
+  "enableReactiveTitle": "Enable Reactive Glow Title",
+  "enableReactiveGradBg": "Enable Reactive Gradient Background",
+  "enableReactiveBgScale": "Enable Reactive Background Scale"
 }

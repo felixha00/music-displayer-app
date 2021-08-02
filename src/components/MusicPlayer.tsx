@@ -13,7 +13,7 @@ import {
   Container,
   CircularProgress,
 } from '@chakra-ui/react';
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { IconType } from 'react-icons';
 import {
   RiHeadphoneLine,
@@ -22,11 +22,16 @@ import {
   RiTimerLine,
   RiTimerFlashLine,
   RiCalendarEventFill,
+  RiPlayListAddLine,
 } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import { usePalette } from 'react-palette';
 import ReactAudioPlayer from 'react-audio-player';
-import AudioSpectrum from 'react-audio-spectrum';
+import MoonLoader from 'react-spinners/MoonLoader';
+import { ContextMenuTrigger } from 'react-contextmenu';
+import AudioSpectrum from './Visualizer/CustomAudioSpectrum';
+//import AudioSpectrum from 'react-audio-spectrum';
+
 import { RootState } from '../app/store/store';
 import { sToMMSS } from '../utils/time';
 import {
@@ -35,25 +40,26 @@ import {
   loadingSelector,
   setPalette,
 } from '../app/store/actions/playerActions';
+
 import NextSongBadge from './Player/NextSongBadge';
 import PlaybackControl from './Player/PlaybackControl';
-import MoonLoader from 'react-spinners/MoonLoader';
+import GenerateCtxMenu from './ContextMenus/GenerateCtxMenu';
+import { albumArtPlaying, CtxMenuTypes } from './ContextMenus/ctxMenuSchemas';
+import { ipcRenderer, remote } from 'electron';
+import { useBass } from '../utils/hooks';
+import LazyLoad from 'react-lazyload';
+import { MotionBox, MotionText } from './Wrappers/FramerComponents';
+import MusicDetails from './Player/MusicDetails';
+import defaultImg from '../assets/default-playlist-img.png';
+import NothingPlaying from '../fragments/NothingPlaying';
+import { getCombinedQueue } from '../app/store/actions/queueActions';
 interface IObjectKeys {
   [key: string]: string | number;
 }
 
-const musicDetailSchema = [
-  { text: 'title', icon: RiHeadphoneLine },
-  { text: 'artist', icon: RiUserVoiceLine },
-  { text: 'album', icon: RiAlbumLine },
-  { text: 'length', icon: RiTimerLine },
-  { text: 'bpm', icon: RiTimerFlashLine },
-  { text: 'year', icon: RiCalendarEventFill },
-];
-
 interface MusicDetailCellPropT {
   text: string;
-  icon: IconType;
+  icon: IconType | undefined;
   textColor: string | undefined;
 }
 
@@ -61,7 +67,7 @@ const MusicDetailCell = (props: MusicDetailCellPropT) => {
   const { text, icon, textColor } = props;
   return (
     <HStack alignItems="center" spacing={1}>
-      <Icon as={icon} color={textColor || 'white'} />
+      {icon && <Icon as={icon} color={textColor || 'white'} />}
       <Text className="player-details-type">{text}</Text>
     </HStack>
   );
@@ -74,39 +80,72 @@ const MusicPlayer = (props: Props) => {
     player: state.player,
     settings: state.settings,
   }));
+  const { current } = player;
+  const { title, songPath } = current || {};
 
-  const playerRef = useRef();
-  const { data, loading, error } = usePalette(player.current.image);
+  const playerRef = useRef<ReactAudioPlayer>(null);
+  const { data, loading } = usePalette(player.current?.image || '');
 
   // STATES
   const [time, setTime] = useState(0);
   const [vol, setVol] = useState(player.vol);
   const [songLoading, setSongLoading] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [bass, handleSetBass] = useBass();
+
+  const handleItemClick = (type: string, itemData: string) => {
+    switch (type) {
+      case CtxMenuTypes.viewInFolder:
+        console.log('viewInFolder');
+        ipcRenderer.send('openSongInFolder', itemData);
+        break;
+      default:
+        break;
+    }
+
+    // remote.shell.showItemInFolder(itemData);
+    // console.log(type, itemData);
+  };
+  const renderCtxMenu = React.useCallback(() => {
+    return (
+      <GenerateCtxMenu
+        id="songArt"
+        menuItems={albumArtPlaying}
+        onItemClick={handleItemClick}
+        data={songPath}
+      />
+    );
+  }, [songPath]);
 
   useEffect(() => {
     setSongLoading(loadingSelector('song'));
+    return () => {
+      setSongLoading(false);
+    };
   }, [player.loading]);
+
   // useEffect(() => {
-  //   if (player.queue.length > 0 && !player.loading) {
-  //     setSong(player.queue[player.songIndex]);
-  //     setNextSong(player.queue[player.songIndex + 1]);
+  //   if (
+  //     (current === null && queue.length !== 0) ||
+  //     priorityQueue.length !== 0
+  //   ) {
+  //     gotoNextSong();
   //   }
-  // }, [player.queue, player.songIndex, player.loading]);
+  // }, [current, queue.length, priorityQueue.length]);
 
   useEffect(() => {
-    const { title } = player.current;
     if (!loading && title !== undefined) {
       setPalette(data);
     }
-  }, [loading, player.current.title, data]);
+  }, [loading, title, data]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!songLoading && player.playing) {
-        setTime(time + 1);
-      }
-    }, 1000);
-    return () => clearTimeout(timer);
+    // const timer = setTimeout(() => {
+    //   if (!songLoading && player.playing && ready) {
+    //     setTime(time + 1);
+    //   }
+    // }, 1000);
+    // return () => clearTimeout(timer);
   });
 
   const handleNext = () => {
@@ -117,7 +156,7 @@ const MusicPlayer = (props: Props) => {
     gotoPrevSong();
   };
 
-  const handleVolChange = (n) => {
+  const handleVolChange = (n: number) => {
     setVol(n);
   };
 
@@ -142,101 +181,114 @@ const MusicPlayer = (props: Props) => {
   };
 
   const handleRAPReady = () => {
-    console.log('h');
+    setReady(true);
   };
 
   const handleAudioErr = () => {
     gotoNextSong();
   };
-  if (songLoading) {
-    return (
-      <Box className="flex-absolute-box">
-        <MoonLoader color={player.palette.lightVibrant} />
-      </Box>
-    );
+
+  if (
+    !player.current ||
+    (!player.current.songPath && getCombinedQueue().length === 0)
+  ) {
+    return <NothingPlaying />;
   }
+
+  // if (songLoading) {
+  //   return (
+  //     <Box className="flex-absolute-box">
+  //       <MoonLoader color={player.palette.lightVibrant} />
+  //     </Box>
+  //   );
+  // }
 
   return (
     <>
-      <ReactAudioPlayer
-        listenInterval={1000}
-        id="audio-elem"
-        src={`${player.queue[player.songIndex]}`}
-        volume={vol}
-        onEnded={handleRAPEnded}
-        onListen={handleRAPListen}
-        onAbort={handleRAPAbort}
-        onError={handleAudioErr}
-        autoPlay={player.playing}
-        ref={playerRef}
-        onCanPlayThrough={handleRAPReady}
-      />
-      <Grid gridTemplateColumns="min-content 1fr" gap={16}>
+      <Grid
+        gridTemplateColumns={{ base: '1fr', md: '0.4fr 1fr' }}
+        gap={{ base: 4, lg: 16 }}
+      >
         <VStack spacing={8} alignSelf="flex-end">
           <NextSongBadge />
-          <AspectRatio minW="100px" w="500px" ratio={1}>
-            <Image
-              src={player.current.image}
-              className="rounded"
-              fallbackSrc={'https://via.placeholder.com/150'}
-            />
-          </AspectRatio>
-
-          <Box
-            className="player-control rounded"
-            bgGradient={
-              data
-                ? `linear(to-r, ${player.palette.vibrant},  ${player.palette.vibrant} )`
-                : 'black'
-            }
-            w="100%"
-            padding={4}
-          >
-            <VStack alignItems="flex-start" width="100%">
-              <Progress
-                isAnimated
-                className="rounded"
-                value={(time / player.current.length) * 100}
-                width="100%"
-                size="xs"
-                colorScheme="whiteAlpha"
-              />
-              <Text fontSize="sm">Elapsed: {sToMMSS(time)}</Text>
-              {settings.config.enableControls && (
-                <>
-                  <PlaybackControl
-                    playerRef={playerRef}
-                    onNext={handleNext}
-                    onPrev={handlePrev}
-                    onVolChange={handleVolChange}
-                  />
-                </>
-              )}
-            </VStack>
+          <Box boxShadow="xl" className="rounded" w="100%">
+            <ContextMenuTrigger id="songArt">
+              <AspectRatio ratio={1}>
+                <MotionBox
+                  animate={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, scale: 1.05 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="player-album-art"
+                  key={`player-album-art-${player.current.title}-${player.current.artist}`}
+                >
+                  <Box
+                    display="flex"
+                    as={LazyLoad}
+                    style={{
+                      minWidth: '100%',
+                      minHeight: '100%',
+                    }}
+                  >
+                    <Image
+                      style={{
+                        minWidth: '100%',
+                        //height: '-webkit-fill-available',
+                        objectFit: 'cover',
+                      }}
+                      bg={player.palette.vibrant}
+                      src={player.current.image || defaultImg}
+                      className="rounded"
+                      borderBottomRadius={0}
+                    />
+                  </Box>
+                </MotionBox>
+              </AspectRatio>
+            </ContextMenuTrigger>
+            <Box
+              className="player-control rounded"
+              // bgGradient={
+              //   data
+              //     ? `linear(to-r, ${player.palette.vibrant},  ${player.palette.vibrant} )`
+              //     : 'black'
+              // }
+              bgColor={`${player.palette.vibrant}D1`}
+              backdropFilter="blur(8px)"
+              w="100%"
+              padding={4}
+              borderTopRadius={0}
+            >
+              <VStack alignItems="flex-start" width="100%">
+                <PlaybackControl
+                  //ref={playerRef}
+                  onNext={handleNext}
+                  onPrev={handlePrev}
+                  onVolChange={handleVolChange}
+                />
+              </VStack>
+            </Box>
           </Box>
         </VStack>
 
         <VStack alignSelf="flex-end" alignItems="flex-start" flexGrow={1}>
-          {settings.config.enableSpectrum && playerRef.current ? (
+          {settings.config.enableSpectrum ? (
             <Box
             // pb={4}
             // borderBottom={`2px solid ${player.palette.lightVibrant}`}
             >
               <AudioSpectrum
+                config={settings.config}
+                audioId="audio-player"
                 className="audio-spectrum"
                 id="audio-canvas"
+                key={`${player.current.title}-spectrum`}
                 height={125}
                 width={252}
-                audioEle={playerRef.current.audioEl.current}
+                // audioEle={playerRef.current.audioEl.current}
                 capColor="transparent"
                 capHeight={2}
                 meterWidth={2}
-                meterCount={256}
-                meterColor={[
-                  { stop: 0, color: player.palette.lightVibrant },
-                  { stop: 0.5, color: player.palette.lightVibrant },
-                  { stop: 1, color: player.palette.lightVibrant },
-                ]}
+                meterCount={1024}
+                meterColor={player.palette.lightVibrant || 'white'}
                 gap={8}
               />
             </Box>
@@ -244,52 +296,12 @@ const MusicPlayer = (props: Props) => {
             <div />
           )}
           <div />
-          <Grid
-            className="player-details-grid"
-            templateColumns="100px 1fr"
-            w="100%"
-          >
-            {musicDetailSchema.map((detail) => {
-              const { text, icon } = detail;
-              let dataText = '';
-
-              if (player.current[text] === undefined) return <></>;
-
-              switch (text) {
-                case 'length':
-                  dataText = sToMMSS(+player.current[text]);
-                  break;
-                default:
-                  dataText = player.current[text];
-                  break;
-              }
-              return (
-                <>
-                  <MusicDetailCell
-                    textColor={player.palette.lightVibrant}
-                    key={text}
-                    text={text}
-                    icon={icon}
-                  />
-                  {text === 'title' ? (
-                    <Heading paddingTop={8} paddingBottom={4} size="4xl">
-                      {dataText}
-                    </Heading>
-                  ) : (
-                    <Text
-                      color={text === '' ? player.palette.vibrant : ''}
-                      fontSize="2xl"
-                    >
-                      {dataText}
-                    </Text>
-                  )}
-                </>
-              );
-            })}
-          </Grid>
+          {player.current && <MusicDetails />}
           <Spacer />
         </VStack>
       </Grid>
+      {renderCtxMenu()}
+
       {/* <pre>{JSON.stringify(player)}</pre> */}
     </>
   );
