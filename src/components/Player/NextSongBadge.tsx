@@ -11,12 +11,9 @@ import {
 import React, { useEffect } from 'react';
 import { usePalette } from 'react-palette';
 import { useSelector } from 'react-redux';
-import {
-  combineQueues,
-  setNextSong,
-} from '../../app/store/actions/playerActions';
+import { setNextSong } from '../../app/store/actions/playerActions';
+import { getCombinedQueue } from '../../app/store/actions/queueActions';
 import { RootState } from '../../app/store/store';
-import { usePrevious } from '../../utils/hooks';
 import './next-song-badge.scss';
 
 const NextSongBadge = () => {
@@ -30,7 +27,7 @@ const NextSongBadge = () => {
   );
 
   useEffect(() => {
-    const q = [...priorityQueue, ...queue];
+    const q = getCombinedQueue();
     // Check if next song is not set, if it isnt, set it
 
     if (q[0]) {
@@ -69,13 +66,22 @@ const NextSongBadge = () => {
         {next ? (
           <Box display="flex" alignItems="center">
             <Text textAlign="right" fontSize="xs" ml={2}>
-              <span style={{ fontWeight: 'bold' }}>{next?.title}</span> by{' '}
-              {next?.artist}, on{' '}
-              <span
-                style={{ color: `${data.lightVibrant}`, fontWeight: 'bold' }}
-              >
-                {next?.album}
-              </span>
+              <span style={{ fontWeight: 'bold' }}>{next?.title}</span>
+              {next?.artist && <> by {next?.artist}</>}
+
+              {next?.album && (
+                <>
+                  , on{' '}
+                  <span
+                    style={{
+                      color: `${data.lightVibrant}`,
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {next?.album}
+                  </span>
+                </>
+              )}
             </Text>
           </Box>
         ) : (

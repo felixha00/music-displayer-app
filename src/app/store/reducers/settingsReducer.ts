@@ -1,7 +1,6 @@
 import { ipcRenderer } from 'electron';
 import { Action } from '../../../utils/types';
 import ActionTypes from '../actionTypes';
-import { eStore } from '../store';
 
 export type SettingsState = {
   config: SettingsConfig;

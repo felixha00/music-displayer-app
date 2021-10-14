@@ -40,7 +40,6 @@ export const formatMetadata = async (
       'https://www.gothiccountry.se/images/pictures2/no_album_art__no_cover.jpg';
   }
 
-  console.log('LULW');
   const songData = {
     title: common.title || path.basename(songPath, path.extname(songPath)),
     album: common.album,
@@ -52,6 +51,11 @@ export const formatMetadata = async (
     songPath,
     genre: common.genre,
     track: common.track.no,
+    extraInfo: {
+      bitrate: format.bitrate,
+      container: format.container,
+      sampleRate: format.sampleRate,
+    },
   };
 
   return songData;
@@ -243,7 +247,7 @@ export const rescanLibrary = (
   cb: (nMissing: number, nDeleted: number) => void
 ) => {
   // infoToast('Rescanning Libary...');
-  glob(`${startPath}/**/*.mp3`, {}, (err, files: Array<string>) => {
+  glob(`${startPath}/**/*.{mp3,flac}`, {}, (err, files: Array<string>) => {
     fs.readFile('dir.json', 'utf8', async (err, data) => {
       const existingLib: Array<ISong> = JSON.parse(data);
       const songPaths = existingLib.map(({ songPath }) => songPath);

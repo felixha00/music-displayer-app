@@ -162,7 +162,7 @@ const Home = () => {
         <Box
           className="album-art-bg"
           id="album-art-bg"
-          key={player.current.songPath}
+          key={player.current?.songPath}
           bgImage={player.current?.image}
         />
       )}
@@ -172,7 +172,7 @@ const Home = () => {
         display="flex"
         flexDir="column"
         borderBottom={`4px solid ${player.palette.vibrant}`}
-        key={player.current?.title}
+        key={player.current?.id}
       >
         <SongBackgroundText />
         <ExtraGIFDisplayer

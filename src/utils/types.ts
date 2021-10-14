@@ -4,7 +4,14 @@ export interface Action {
   payload?: any;
 }
 
+export type ISongExtras = {
+  bitrate: number;
+  container: string;
+  sampleRate: number;
+};
+
 export interface ISong {
+  id: string | undefined;
   title: string | undefined;
   artist: string | undefined;
   album: string | undefined;
@@ -15,6 +22,7 @@ export interface ISong {
   genre: string | undefined;
   songPath: string;
   track: number | null;
+  extraInfo: ISongExtras | undefined;
 }
 
 export type LoadingTypes = 'player' | 'app' | 'song';

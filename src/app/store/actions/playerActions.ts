@@ -15,7 +15,6 @@ import {
 } from '../../../components/Toasts/generateToasts';
 import { getCombinedQueue } from './queueActions';
 
-
 export const loadingSelector = (loadingType: LoadingTypes) => {
   const loadingArray = store.getState().player.loading;
   if (loadingArray.indexOf(loadingType) > -1) {
@@ -49,7 +48,6 @@ export const setSong = async (songPath?: string, songData?: ISong) => {
     });
     return loadingSetter('song', false);
   }
-  console.log(songPath);
   if (songPath) {
     getMetadata(songPath)
       .then((metadata) => {
@@ -119,9 +117,11 @@ export const gotoNextSong = () => {
   if (getCombinedQueue().length === 0) {
     return store.dispatch({ type: ActionTypes.PLAYER_SET_SONG, payload: null });
   }
-  store.dispatch({ type: ActionTypes.PLAYER_SET_SONG, payload: next });
-  store.dispatch({ type: ActionTypes.PLAYER_SET_NEXT_SONG, payload: null });
-  store.dispatch({ type: ActionTypes.PLAYER_NEXT_INDEX });
+  if (next) {
+    store.dispatch({ type: ActionTypes.PLAYER_SET_SONG, payload: next });
+    store.dispatch({ type: ActionTypes.PLAYER_SET_NEXT_SONG, payload: null });
+    store.dispatch({ type: ActionTypes.PLAYER_NEXT_INDEX });
+  }
 };
 
 export const gotoPrevSong = () => {

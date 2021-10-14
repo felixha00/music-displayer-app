@@ -8,9 +8,10 @@ import logger from 'redux-logger';
 import audioReducer from './reducers/audioReducer';
 import playerReducer from './reducers/playerReducer';
 import settingsReducer from './reducers/settingsReducer';
-// import Store from 'electron-store';
+import queueReducer from './reducers/queueReducer';
 
 const rootReducer = combineReducers({
+  queue: queueReducer,
   player: playerReducer,
   settings: settingsReducer,
   audio: audioReducer,

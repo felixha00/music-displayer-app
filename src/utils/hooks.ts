@@ -8,7 +8,6 @@ export const usePrevious = <T extends unknown>(value: T): T | undefined => {
   return ref.current;
 };
 
-export const useKeyboardEvent = () => {};
 
 export const useBass = () => {
   const [bass, setBass] = useState<number>(0);

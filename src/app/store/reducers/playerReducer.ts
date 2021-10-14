@@ -1,6 +1,7 @@
 import { PaletteColors } from 'react-palette';
 import { Action, ISong } from '../../../utils/types';
 import ActionTypes from '../actionTypes';
+import _ from 'lodash';
 
 export type PlayerState = {
   current: ISong | null;
@@ -55,7 +56,7 @@ export default (state = initialState, action: Action): PlayerState => {
     case ActionTypes.PLAYER_SET_SONG: {
       return {
         ...state,
-        current: action.payload,
+        current: {...action.payload, id: _.uniqueId()},
         currentTime: 0,
       };
     }

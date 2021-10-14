@@ -274,6 +274,7 @@
     "moment": "^2.29.1",
     "moment-duration-format": "^2.3.2",
     "music-metadata": "^7.8.8",
+    "numeral": "^2.0.6",
     "react": "^17.0.1",
     "react-audio-player": "^0.17.0",
     "react-audio-spectrum": "^0.1.0",
