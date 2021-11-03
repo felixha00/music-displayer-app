@@ -1,13 +1,10 @@
+import imageCompression from 'browser-image-compression';
+import glob from 'glob';
 import * as fs from 'graceful-fs';
+import _ from 'lodash';
 import * as mm from 'music-metadata';
 import path from 'path';
-import _ from 'lodash';
-import store from '../app/store/store';
 import { ISong } from './types';
-import glob from 'glob';
-import { promisify } from 'util';
-import imageCompression from 'browser-image-compression';
-import { infoToast } from '../components/Toasts/generateToasts';
 
 export const parseBase64 = (format: string, data: string) => {
   return `data:${format};base64,${data}`;
@@ -40,7 +37,7 @@ export const formatMetadata = async (
       'https://www.gothiccountry.se/images/pictures2/no_album_art__no_cover.jpg';
   }
 
-  const songData = {
+  const songData: ISong = {
     title: common.title || path.basename(songPath, path.extname(songPath)),
     album: common.album,
     artist: common.artist,
@@ -67,7 +64,7 @@ export const formatMetadataNoCover = (
 ): ISong => {
   const { common, format } = metadata;
 
-  const songData = {
+  const songData: ISong = {
     title: common.title,
     album: common.album,
     artist: common.artist,

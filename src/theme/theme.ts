@@ -6,6 +6,10 @@ const config: ThemeConfig = {
   useSystemColorMode: false,
 };
 
+export const space = {
+  base: 2,
+  md: 4,
+};
 const theme = extendTheme(
   withDefaultSize({
     size: 'sm',
@@ -53,6 +57,11 @@ const theme = extendTheme(
       Text: {
         baseStyle: {
           fontSize: 'sm',
+        },
+      },
+      IconButton: {
+        defaultProps: {
+          variant: 'ghost',
         },
       },
       Heading: {},

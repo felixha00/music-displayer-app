@@ -23,6 +23,7 @@ function* onQueueChange() {
   );
 
   if (!current) {
+    yield put({ type: ActionTypes.PLAYER_NEXT });
   }
 }
 
@@ -30,4 +31,4 @@ function* watchQueueChange() {
   yield takeEvery([ActionTypes.PLAYER_UPDATE_QUEUE], onQueueChange);
 }
 
-export default [watchSetCurrentSong()];
+export default [watchSetCurrentSong(), watchQueueChange()];

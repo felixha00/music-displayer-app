@@ -4,7 +4,7 @@ import {
   findAllSongPathsFromDir,
   parsePlaylist,
 } from '../../../utils/file';
-import store from '../store';
+import store, { RootState } from '../store';
 import ActionTypes from '../actionTypes';
 import { PaletteColors } from 'react-palette';
 import { ISong, LoadingTypes } from '../../../utils/types';
@@ -166,9 +166,11 @@ export const insertIntoFrontOfQueue = (
     priority,
     paths: songPaths,
   };
-  // if (current === null) {
-  //   return setSong(songPath);
-  // }
+
+  if (current === null) {
+    const songPath = payload.paths.shift();
+    setSong(songPath);
+  }
   store.dispatch({
     type: ActionTypes.PLAYER_UPDATE_QUEUE,
     payload,
@@ -279,12 +281,15 @@ export const setVol = (n: number) => {
 ipcRenderer.on('onPickSongFromDevice', (e, args: Array<string>) => {
   const {
     player: { current },
-  } = store.getState();
+  }: RootState = store.getState();
   // args.forEach((songPath: string) => {
   //   insertIntoFrontOfQueue(songPath);
   // });
-  if (current) {
+  if (args.length) {
+    if (current || getCombinedQueue().length > 0) {
+      return insertIntoFrontOfQueue(args);
+    }
+    return setQueue(args);
   }
-  setQueue(args);
 });
 export default {};

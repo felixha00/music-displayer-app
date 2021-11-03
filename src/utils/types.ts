@@ -5,9 +5,9 @@ export interface Action {
 }
 
 export type ISongExtras = {
-  bitrate: number;
-  container: string;
-  sampleRate: number;
+  bitrate: number | undefined;
+  container: string | undefined;
+  sampleRate: number | undefined;
 };
 
 export interface ISong {
@@ -19,7 +19,7 @@ export interface ISong {
   length: number | undefined;
   bpm: number | undefined;
   year: number | undefined;
-  genre: string | undefined;
+  genre: string[] | undefined;
   songPath: string;
   track: number | null;
   extraInfo: ISongExtras | undefined;

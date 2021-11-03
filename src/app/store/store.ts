@@ -21,8 +21,6 @@ const rootReducer = combineReducers({
 
 export type RootState = ReturnType<typeof rootReducer>;
 
-// export const eStore = new Store();
-
 const store = createStore(rootReducer, applyMiddleware(logger, sagaMiddleware));
 sagaMiddleware.run(rootSaga);
 

@@ -31,12 +31,12 @@ export default (state = initialState, action: Action): QueueState => {
       if (!priority) {
         return {
           ...state,
-          queue: [...state.queue, path],
+          queue: [...state.queue, ...path],
         };
       }
       return {
         ...state,
-        priorityQueue: [...state.priorityQueue, path],
+        priorityQueue: [...state.priorityQueue, ...path],
       };
     }
     default: {

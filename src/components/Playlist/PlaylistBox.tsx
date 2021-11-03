@@ -1,6 +1,15 @@
-import { Box, AspectRatio, Image, Text } from '@chakra-ui/react';
+import {
+  Box,
+  AspectRatio,
+  Image,
+  Text,
+  Stack,
+  Spacer,
+  Flex,
+} from '@chakra-ui/react';
 import React, { useEffect } from 'react';
 import { WhiteIconAlbum } from '../../assets/ImageImports';
+import { space } from '../../theme/theme';
 
 interface Props {
   name: string;
@@ -16,13 +25,15 @@ const PlaylistBox = (props: Props) => {
   // };
 
   return (
-    <Box
+    <Stack
+      spacing={0}
       // onClick={handlePlaylistClick}
       className="rounded"
       border="1px solid"
       borderColor="whiteAlpha.50"
       bg="whiteAlpha.50"
       boxShadow="xl"
+      h="100%"
     >
       <AspectRatio ratio={1}>
         <Image
@@ -31,10 +42,11 @@ const PlaylistBox = (props: Props) => {
           borderBottomRadius="0px"
         />
       </AspectRatio>
-      <Box p={4}>
+      <Spacer />
+      <Box p={space}>
         <Text>{name}</Text>
       </Box>
-    </Box>
+    </Stack>
   );
 };
 
