@@ -12,6 +12,7 @@ import {
   Portal,
   Progress,
   Text,
+  Stack,
 } from '@chakra-ui/react';
 import React, { useEffect, useCallback, useState } from 'react';
 import {
@@ -21,6 +22,8 @@ import {
   RiSkipForwardMiniFill,
   RiVolumeUpFill,
   RiShuffleFill,
+  RiRepeatFill,
+  RiRepeatOneFill,
 } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import ReactAudioPlayer from 'react-audio-player';
@@ -41,6 +44,12 @@ interface Props {
   onVolChange: (vol: number) => void;
 }
 
+const controlButtonProps = {
+  size: 'md',
+  isRound: true,
+  variant: 'ghost',
+};
+
 const PlaybackControl = (props: Props) => {
   // const { playerRef } = props;
   const playerRef = React.useRef<ReactAudioPlayer>(null);
@@ -57,6 +66,15 @@ const PlaybackControl = (props: Props) => {
   const [playbackRdy, setPlaybackRdy] = React.useState(false);
   const [playVol, setPlayVol] = useState(vol);
   const [songSliderChanging, setSongSliderChanging] = useState(false);
+
+  const activeControlBtnProps = React.useMemo(
+    () => ({
+      bg: 'white',
+      color: player.palette.vibrant,
+    }),
+    [player.palette]
+  );
+
   const audioEl = React.useMemo(() => {
     if (player.current) {
       return playerRef?.current?.audioEl.current;
@@ -220,54 +238,56 @@ const PlaybackControl = (props: Props) => {
             onClick={handleNext}
           />
           <Spacer />
-          <IconButton
-            as={RiShuffleFill}
-            onClick={handleShuffle}
-            color="whiteAlpha.700"
-            _hover={{ color: 'white' }}
-            aria-label="next"
-            isRound
-            variant="unstyled"
-            size="14px"
-          />
-          <Menu placement="left-start" matchWidth>
-            <MenuButton
-              className="vol-btn"
-              as={IconButton}
-              aria-label="next"
-              isRound
-              variant="ghost"
-              size="md"
-              icon={<RiVolumeUpFill style={{ display: 'inline' }} />}
+          <Stack direction="row" spacing={0}>
+            <IconButton
+              icon={<RiRepeatFill />}
+              onClick={handleShuffle}
+              aria-label="repeat"
+              {...controlButtonProps}
             />
-            <Portal>
-              <MenuList
-                border="none"
-                bg="black"
-                maxWidth="fit-content"
-                minWidth="fit-content"
-                p={2}
-                pl={4}
-                pr={5}
-              >
-                {audioEl && (
-                  <Slider
-                    aria-label="slider-ex-3"
-                    defaultValue={audioEl.volume * 100}
-                    onChange={handleVolChange}
-                    onChangeEnd={handleVolChangeEnd}
-                    orientation="horizontal"
-                    minW="32"
-                  >
-                    <SliderTrack>
-                      <SliderFilledTrack bg={player.palette.lightVibrant} />
-                    </SliderTrack>
-                    <SliderThumb />
-                  </Slider>
-                )}
-              </MenuList>
-            </Portal>
-          </Menu>
+            <IconButton
+              icon={<RiShuffleFill />}
+              onClick={handleShuffle}
+              aria-label="next"
+              {...controlButtonProps}
+            />
+            <Menu placement="left-start" matchWidth>
+              <MenuButton
+                className="vol-btn"
+                as={IconButton}
+                aria-label="next"
+                {...controlButtonProps}
+                icon={<RiVolumeUpFill style={{ display: 'inline' }} />}
+              />
+              <Portal>
+                <MenuList
+                  border="none"
+                  bg="black"
+                  maxWidth="fit-content"
+                  minWidth="fit-content"
+                  p={2}
+                  pl={4}
+                  pr={5}
+                >
+                  {audioEl && (
+                    <Slider
+                      aria-label="slider-ex-3"
+                      defaultValue={audioEl.volume * 100}
+                      onChange={handleVolChange}
+                      onChangeEnd={handleVolChangeEnd}
+                      orientation="horizontal"
+                      minW="32"
+                    >
+                      <SliderTrack>
+                        <SliderFilledTrack bg={player.palette.lightVibrant} />
+                      </SliderTrack>
+                      <SliderThumb />
+                    </Slider>
+                  )}
+                </MenuList>
+              </Portal>
+            </Menu>
+          </Stack>
         </ButtonGroup>
       )}
     </>

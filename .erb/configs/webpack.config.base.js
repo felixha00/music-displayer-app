@@ -5,6 +5,7 @@
 import path from 'path';
 import webpack from 'webpack';
 import { dependencies as externals } from '../../src/package.json';
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 export default {
   externals: [...Object.keys(externals || {})],
@@ -36,11 +37,15 @@ export default {
   resolve: {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
     modules: [path.join(__dirname, '../../src'), 'node_modules'],
+    // alias: { '@': path.join(__dirname, '../../src') },
   },
 
   plugins: [
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
+    }),
+    new TsconfigPathsPlugin({
+      baseUrl: path.join(__dirname, '../../src'), // path to tsconfig.json directory
     }),
   ],
 };

@@ -42,7 +42,14 @@ const theme = extendTheme(
           bg: mode('gray.100', 'black')(props),
         }),
       },
-
+      Tooltip: {
+        baseStyle: {
+          backgroundColor: 'white',
+        },
+        defaultProps: {
+          placement: 'right',
+        },
+      },
       Text: {
         baseStyle: {
           fontSize: 'sm',

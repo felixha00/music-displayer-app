@@ -1,58 +1,40 @@
 import {
-  VStack,
-  Image,
-  Box,
   AspectRatio,
-  Heading,
+  Box,
+  Grid,
+  HStack,
+  Icon,
+  Image,
   Spacer,
   Text,
-  HStack,
-  Grid,
-  Progress,
-  Icon,
-  Container,
-  CircularProgress,
+  VStack,
 } from '@chakra-ui/react';
+import { ipcRenderer } from 'electron';
 import React, { useEffect, useRef, useState } from 'react';
-import { IconType } from 'react-icons';
-import {
-  RiHeadphoneLine,
-  RiUserVoiceLine,
-  RiAlbumLine,
-  RiTimerLine,
-  RiTimerFlashLine,
-  RiCalendarEventFill,
-  RiPlayListAddLine,
-} from 'react-icons/ri';
-import { useSelector } from 'react-redux';
-import { usePalette } from 'react-palette';
 import ReactAudioPlayer from 'react-audio-player';
-import MoonLoader from 'react-spinners/MoonLoader';
 import { ContextMenuTrigger } from 'react-contextmenu';
-import AudioSpectrum from './Visualizer/CustomAudioSpectrum';
-//import AudioSpectrum from 'react-audio-spectrum';
-
-import { RootState } from '../app/store/store';
-import { sToMMSS } from '../utils/time';
+import { IconType } from 'react-icons';
+import LazyLoad from 'react-lazyload';
+import { usePalette } from 'react-palette';
+import { useSelector } from 'react-redux';
 import {
   gotoNextSong,
   gotoPrevSong,
   loadingSelector,
   setPalette,
 } from '../app/store/actions/playerActions';
-
-import NextSongBadge from './Player/NextSongBadge';
-import PlaybackControl from './Player/PlaybackControl';
-import GenerateCtxMenu from './ContextMenus/GenerateCtxMenu';
-import { albumArtPlaying, CtxMenuTypes } from './ContextMenus/ctxMenuSchemas';
-import { ipcRenderer, remote } from 'electron';
-import { useBass } from '../utils/hooks';
-import LazyLoad from 'react-lazyload';
-import { MotionBox, MotionText } from './Wrappers/FramerComponents';
-import MusicDetails from './Player/MusicDetails';
+import { getCombinedQueue } from '../app/store/actions/queueActions';
+import { RootState } from '../app/store/store';
 import defaultImg from '../assets/default-playlist-img.png';
 import NothingPlaying from '../fragments/NothingPlaying';
-import { getCombinedQueue } from '../app/store/actions/queueActions';
+import { albumArtPlaying, CtxMenuTypes } from './ContextMenus/ctxMenuSchemas';
+import GenerateCtxMenu from './ContextMenus/GenerateCtxMenu';
+import MusicDetails from './Player/MusicDetails';
+import NextSongBadge from './Player/NextSongBadge';
+import PlaybackControl from './Player/PlaybackControl';
+import AudioSpectrum from './Visualizer/CustomAudioSpectrum';
+import { MotionBox } from './Wrappers/FramerComponents';
+
 interface IObjectKeys {
   [key: string]: string | number;
 }
@@ -73,9 +55,7 @@ const MusicDetailCell = (props: MusicDetailCellPropT) => {
   );
 };
 
-interface Props {}
-
-const MusicPlayer = (props: Props) => {
+const MusicPlayer = () => {
   const { player, settings } = useSelector((state: RootState) => ({
     player: state.player,
     settings: state.settings,
@@ -91,7 +71,6 @@ const MusicPlayer = (props: Props) => {
   const [vol, setVol] = useState(player.vol);
   const [songLoading, setSongLoading] = useState(false);
   const [ready, setReady] = useState(false);
-  const [bass, handleSetBass] = useBass();
 
   const handleItemClick = (type: string, itemData: string) => {
     switch (type) {
@@ -124,20 +103,11 @@ const MusicPlayer = (props: Props) => {
     };
   }, [player.loading]);
 
-  // useEffect(() => {
-  //   if (
-  //     (current === null && queue.length !== 0) ||
-  //     priorityQueue.length !== 0
-  //   ) {
-  //     gotoNextSong();
-  //   }
-  // }, [current, queue.length, priorityQueue.length]);
-
   useEffect(() => {
-    if (!loading && title !== undefined) {
+    if (!loading) {
       setPalette(data);
     }
-  }, [loading, title, data]);
+  }, [loading, data]);
 
   useEffect(() => {
     // const timer = setTimeout(() => {
@@ -232,7 +202,6 @@ const MusicPlayer = (props: Props) => {
                     <Image
                       style={{
                         minWidth: '100%',
-                        //height: '-webkit-fill-available',
                         objectFit: 'cover',
                       }}
                       bg={player.palette.vibrant}

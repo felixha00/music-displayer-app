@@ -7,16 +7,6 @@ export type QueueState = {
 };
 
 const initialState: QueueState = {
-  // current: {
-  //   title: '',
-  //   artist: '',
-  //   album: '',
-  //   length: 0,
-  //   image: '',
-  //   bpm: undefined,
-  //   songPath: '',
-  //   year: undefined,
-  // },
   queue: [],
   priorityQueue: [],
 };

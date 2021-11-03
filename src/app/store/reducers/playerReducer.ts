@@ -16,6 +16,7 @@ export type PlayerState = {
   vol: number;
   loading: Array<string>;
   shuffle: boolean;
+  repeat: 'one' | 'all' | false;
   modal: boolean;
 };
 
@@ -42,6 +43,7 @@ const initialState: PlayerState = {
   vol: 0.2,
   loading: [],
   shuffle: true,
+  repeat: false,
   modal: false,
 };
 
@@ -54,9 +56,13 @@ export default (state = initialState, action: Action): PlayerState => {
       };
     }
     case ActionTypes.PLAYER_SET_SONG: {
+      let payload = null;
+      if (action.payload) {
+        payload = { ...action.payload, id: _.uniqueId() };
+      }
       return {
         ...state,
-        current: {...action.payload, id: _.uniqueId()},
+        current: payload,
         currentTime: 0,
       };
     }
@@ -86,17 +92,41 @@ export default (state = initialState, action: Action): PlayerState => {
         priorityQueue: [],
       };
     }
+    case ActionTypes.PLAYER_UPDATE_QUEUE: {
+      const { priority, paths } = action.payload;
+
+      let queueType = 'queue';
+      if (priority) queueType = 'priorityQueue';
+
+      return {
+        ...state,
+        [queueType]: state[queueType].concat(paths),
+      };
+      // if (!priority) {
+      //   return {
+      //     ...state,
+      //     queue: state.queue.concat(paths),
+      //   };
+      // return {
+      //   ...state,
+      //   priorityQueue: state.priorityQueue.concat(paths),
+      // };
+    }
     case ActionTypes.PLAYER_APPEND_TO_QUEUE: {
-      const { priority, path } = action.payload;
+      const { priority, paths } = action.payload;
+      if (state.current) {
+        paths.splice();
+      }
+
       if (!priority) {
         return {
           ...state,
-          queue: [...state.queue, path],
+          queue: [...state.queue, ...paths],
         };
       }
       return {
         ...state,
-        priorityQueue: [...state.priorityQueue, path],
+        priorityQueue: [...state.priorityQueue, ...paths],
       };
       // if (!state.queue.length) {
       //   return {

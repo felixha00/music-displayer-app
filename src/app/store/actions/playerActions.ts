@@ -141,22 +141,40 @@ export const playAllFromDir = () => {};
  * Inserts songPath into the next spot in the queue
  * @param songPath Absolute path to the song
  */
-export const insertIntoFrontOfQueue = (songPath: string, priority = false) => {
+// export const insertIntoFrontOfQueue = (songPath: string, priority = false) => {
+//   const { current } = store.getState().player;
+//   const payload = {
+//     priority,
+//     path: songPath,
+//   };
+//   // if (current === null) {
+//   //   return setSong(songPath);
+//   // }
+//   store.dispatch({
+//     type: ActionTypes.PLAYER_APPEND_TO_QUEUE,
+//     payload,
+//   });
+//   infoToast(`Added to queue`);
+// };
+
+export const insertIntoFrontOfQueue = (
+  songPaths: Array<string>,
+  priority = false
+) => {
   const { current } = store.getState().player;
   const payload = {
     priority,
-    path: songPath,
+    paths: songPaths,
   };
-  if (current === null) {
-    return setSong(songPath);
-  }
+  // if (current === null) {
+  //   return setSong(songPath);
+  // }
   store.dispatch({
-    type: ActionTypes.PLAYER_APPEND_TO_QUEUE,
+    type: ActionTypes.PLAYER_UPDATE_QUEUE,
     payload,
   });
   infoToast(`Added to queue`);
 };
-
 export const setQueue = (musicPaths: Array<string>, sample?: number) => {
   const cur = musicPaths.shift();
   setSong(cur);
@@ -257,11 +275,16 @@ export const setVol = (n: number) => {
     payload: n,
   });
 };
+
 ipcRenderer.on('onPickSongFromDevice', (e, args: Array<string>) => {
+  const {
+    player: { current },
+  } = store.getState();
   // args.forEach((songPath: string) => {
   //   insertIntoFrontOfQueue(songPath);
   // });
+  if (current) {
+  }
   setQueue(args);
-  //insertIntoFrontOfQueue;
 });
 export default {};

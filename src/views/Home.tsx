@@ -1,126 +1,32 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import {
   Box,
-  Flex,
-  Heading,
-  useDisclosure,
-  Spacer,
-  VStack,
-  ButtonGroup,
+  Button,
   Drawer,
   DrawerBody,
+  DrawerContent,
   DrawerHeader,
   DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  Button,
-  IconButton,
+  Flex,
   Icon,
-  Text,
-  SlideFade,
+  IconButton,
+  Spacer,
+  useDisclosure,
+  VStack,
 } from '@chakra-ui/react';
-import Marquee from 'react-fast-marquee';
-import {
-  RiSettings2Line,
-  RiSpotifyFill,
-  RiInformationFill,
-} from 'react-icons/ri';
-import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import MusicPlayer from '../components/MusicPlayer';
-import store, { RootState } from '../app/store/store';
-import SettingsForm from '../components/Settings/SettingsForm';
-import { loadingSelector } from '../app/store/actions/playerActions';
-import { function2, parsePlaylist, scanDir, readLibrary } from '../utils/file';
-import Loading from './Loading';
-import ActionTypes from '../app/store/actionTypes';
 
-import { generateParticleJS } from '../utils/fn';
-import LibraryDrawer from '../components/Library/LibraryDrawer';
-import InfoDrawer from '../components/Drawers/InfoDrawer';
-import { convertPathsToPlaylist } from '../utils/playlists';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../app/store/store';
 import ExtraGIFDisplayer from '../components/ExtraGIFDisplayer';
-import {
-  MotionBox,
-  MotionHeading,
-} from '../components/Wrappers/FramerComponents';
-import SongMarquee from '../components/Main/SongMarquee';
+import Navigation from '../components/Main/Navigation';
 import SongBackgroundText from '../components/Main/SongBackgroundText';
-
-// const appVersion = require('electron').remote.app.getVersion();
-function SettingsDrawer() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const btnRef = React.useRef();
-
-  const openSpotifyAuthWindow = () => {};
-  const handleParsePlaylist = () => {
-    parsePlaylist().then((h) => {
-      console.log(h);
-    });
-  };
-
-  const x = () => {
-    parsePlaylist().then((h) => {
-      convertPathsToPlaylist(h);
-    });
-  };
-  const handleJSONToPlaylist = async () => {
-    let h = [];
-    let metadatas = [];
-    await function2().then(() => console.log('a'));
-  };
-
-  const handleGlobRead = () => {
-    scanDir('D:/Songs');
-  };
-
-  const readLib = () => {
-    readLibrary();
-  };
-
-  return (
-    <>
-      <IconButton
-        aria-label="Open Settings"
-        icon={<RiSettings2Line />}
-        variant="ghost"
-        size="lg"
-        isRound
-        onClick={onOpen}
-      />
-      <Drawer isOpen={isOpen} placement="right" size="xs" onClose={onClose}>
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerHeader>
-            <Flex alignItems="center">
-              <Icon as={RiSettings2Line} />
-              &nbsp;Settings
-            </Flex>
-          </DrawerHeader>
-
-          <DrawerBody>
-            <VStack alignItems="flex-start" spacing={8}>
-              <Button
-                isFullWidth
-                leftIcon={<RiSpotifyFill />}
-                colorScheme="green"
-                onClick={openSpotifyAuthWindow}
-              >
-                Sign Into Spotify
-              </Button>
-              <SettingsForm />
-              <Button onClick={handleJSONToPlaylist}>Convert Playlist</Button>
-              <Button onClick={handleParsePlaylist}>Parse Playlist</Button>
-              <Button onClick={handleGlobRead}>GlobRead</Button>
-              <Button onClick={x}>Convert files to new playlist</Button>
-              <Button onClick={readLib}>Read Library</Button>
-            </VStack>
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
-    </>
-  );
-}
+import SongMarquee from '../components/Main/SongMarquee';
+import MusicPlayer from '../components/MusicPlayer';
+import SettingsForm from '../components/Settings/SettingsForm';
+import { MotionBox } from '../components/Wrappers/FramerComponents';
+import { function2, parsePlaylist, readLibrary, scanDir } from '../utils/file';
+import { generateParticleJS } from '../utils/fn';
+import { convertPathsToPlaylist } from '../utils/playlists';
 
 const Home = () => {
   const [particleParams, setParticleParams] = useState('#ffffff');
@@ -175,29 +81,13 @@ const Home = () => {
         key={player.current?.id}
       >
         <SongBackgroundText />
-        <ExtraGIFDisplayer
-          height="50%"
-          // key={player.current?.title}
-          copies={1}
-        />
+        <ExtraGIFDisplayer height="50%" copies={1} />
         <Flex
           padding={{ base: 4, md: 8, lg: 16 }}
           flexDirection="column"
           height="100%"
         >
-          <Flex alignItems="center" zIndex="99">
-            {settings.config.enableInfo && (
-              <>
-                <ButtonGroup>
-                  <InfoDrawer />
-                </ButtonGroup>
-              </>
-            )}
-
-            <Spacer />
-            <LibraryDrawer />
-            <SettingsDrawer />
-          </Flex>
+          <Navigation />
           <Spacer />
           <Box>
             <MusicPlayer />

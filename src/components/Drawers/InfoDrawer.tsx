@@ -35,7 +35,7 @@ const InfoDrawer = (props: Props) => {
         onClick={onOpen}
         size="lg"
         isRound
-        variant="unstyled"
+        variant="ghost"
       />
       <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
         <DrawerOverlay />

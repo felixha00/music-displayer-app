@@ -2,26 +2,21 @@ import { Box } from '@chakra-ui/react';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../app/store/store';
-import { useBass } from '../../utils/hooks';
 
 interface Props {
   id: string;
 }
 
 const BassGradient = (props: Props) => {
-  const { vibrant, bass } = useSelector((state: RootState) => ({
+  const { vibrant } = useSelector((state: RootState) => ({
     vibrant: state.player.palette.vibrant,
-    bass: state.audio.bass,
   }));
-  // const { bass } = props;
-  //   const [bass, setBass] = useBass();
-  //   console.log(bass);
+  const { id } = props;
   return (
     <>
       <Box
-        id={props.id}
+        id={id}
         className="flex-absolute-box"
-        // opacity={(bass / 256) ** 3}
         opacity="0.75"
         key="bass"
         h="30%"
@@ -36,7 +31,6 @@ const BassGradient = (props: Props) => {
       />
       <Box
         className="bass-gradient-dots flex-absolute-box"
-        // opacity={(bass / 256) ** 3}
         opacity="0.75"
         h="50%"
         textAlign="left"

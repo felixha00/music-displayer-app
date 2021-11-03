@@ -120,7 +120,7 @@ const SongTable = (props: Props) => {
   };
 
   const handleAddToQueue = (songPath: string, priority = true) => {
-    insertIntoFrontOfQueue(songPath, priority);
+    insertIntoFrontOfQueue([songPath], priority);
   };
 
   const columns = React.useMemo(

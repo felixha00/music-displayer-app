@@ -25,7 +25,7 @@ const SongMarquee = () => {
   return (
     <Box bg="whiteAlpha.100" backdropFilter="blur(5px)" key={songString}>
       <Marquee gradient={false}>
-        <Stack direction="row" spacing={16}>
+        <Stack direction="row" spacing={2}>
           {[...Array(20).keys()].map((num) => (
             <>
               <Heading
@@ -34,7 +34,7 @@ const SongMarquee = () => {
                 fontFamily="Clash Display"
                 textTransform="uppercase"
               >
-                {songString}
+                {`${songString}  —  `}
               </Heading>
               {/* <Image src={WhiteLogo} w="18px" /> */}
             </>

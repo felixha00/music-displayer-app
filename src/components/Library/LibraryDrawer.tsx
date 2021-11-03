@@ -14,7 +14,14 @@ import {
   HStack,
   Heading,
 } from '@chakra-ui/react';
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
+import {
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  Tooltip,
+} from '@chakra-ui/react';
 import QueueTable from './QueueTable';
 import SongLibrary from './SongLibrary';
 import { RiApps2Fill } from 'react-icons/ri';
@@ -73,14 +80,16 @@ const LibraryDrawer = (props: Props) => {
   }, [history]);
   return (
     <>
-      <IconButton
-        aria-label="library"
-        icon={<RiApps2Fill />}
-        onClick={onOpen}
-        size="lg"
-        isRound
-        variant="ghost"
-      />
+      <Tooltip label="My Library">
+        <IconButton
+          aria-label="library"
+          icon={<RiApps2Fill />}
+          onClick={onOpen}
+          size="lg"
+          isRound
+          variant="ghost"
+        />
+      </Tooltip>
       <Drawer
         motionPreset="scale"
         isOpen={isOpen}
@@ -144,4 +153,4 @@ const LibraryDrawer = (props: Props) => {
   );
 };
 
-export default LibraryDrawer;
+export { LibraryDrawer, LibraryDrawer as default };

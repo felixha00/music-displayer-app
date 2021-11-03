@@ -174,7 +174,7 @@ ipcMain.on('pickSongFromDevice', (e) => {
   dialog
     .showOpenDialog(mainWindow!, {
       properties: ['openFile', 'multiSelections'],
-      filters: [{ name: 'Music', extensions: ['mp3', 'flac'] }],
+      filters: [{ name: 'Audio Files', extensions: ['mp3', 'flac'] }],
     })
     .then((res) => {
       return e.sender.send('onPickSongFromDevice', res.filePaths);
