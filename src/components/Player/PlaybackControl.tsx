@@ -241,7 +241,7 @@ const PlaybackControl = (props: Props) => {
           <Stack direction="row" spacing={0}>
             <IconButton
               icon={<RiRepeatFill />}
-              onClick={handleShuffle}
+              onClick={() => {}}
               aria-label="repeat"
               {...controlButtonProps}
             />
