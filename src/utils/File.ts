@@ -1,4 +1,5 @@
 import imageCompression from 'browser-image-compression';
+import { remote } from 'electron';
 import glob from 'glob';
 import * as fs from 'graceful-fs';
 import _ from 'lodash';
@@ -113,11 +114,14 @@ export const getMetadata = async (
   //   ...defaultMetadata,
   //   path: trackPath,
   // };
+
+  // console.log('AYAYAYAYA', `${remote.app.getPath('userData')}\\cache`);
   try {
     if (!songPath) {
       throw new Error('Song Path is not defined');
     }
     const metadata = await mm.parseFile(songPath, { skipCovers });
+
     const parsedSongData = await formatMetadata(metadata, songPath);
     return parsedSongData;
   } catch (err) {

@@ -1,29 +1,16 @@
 import {
   FormControl,
   FormLabel,
-  Input,
-  FormErrorMessage,
-  Button,
-  Flex,
   VStack,
   Switch,
   Spacer,
-  Divider,
-  Text,
-  Box,
-  Badge,
 } from '@chakra-ui/react';
-import { Formik, Form, Field } from 'formik';
 import React, { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ActionTypes from '../../app/store/actionTypes';
 import { RootState } from '../../app/store/store';
-import { findAllSongPathsFromDir } from '../../utils/file';
 import settingsSwitchSchema from '../../schema/settingsSwitchSchema.json';
 import { setQueue } from '../../app/store/actions/playerActions';
-import { remote } from 'electron';
-import ConvertPlaylistModal from '../Playlist/ConvertPlaylistModal';
-import NewPlaylistModal from '../Playlist/NewPlaylistModal';
 interface Props {}
 
 const SettingsForm = (props: Props) => {
@@ -34,9 +21,9 @@ const SettingsForm = (props: Props) => {
     settings: state.settings,
   }));
 
-  const handlePlaylistClick = () => {
-    playlistInRef.current.click();
-  };
+  // const handlePlaylistClick = () => {
+  //   playlistInRef.current.click();
+  // };
 
   const handlePlaylistUpload = (e) => {
     const playlistFile: File = e.currentTarget.files[0];
@@ -51,7 +38,7 @@ const SettingsForm = (props: Props) => {
 
   return (
     <>
-      <Formik
+      {/* <Formik
         initialValues={{ ...settings.config }}
         onSubmit={async (values, actions) => {
           setTimeout(async () => {
@@ -60,8 +47,8 @@ const SettingsForm = (props: Props) => {
             actions.setSubmitting(false);
           }, 1000);
         }}
-      >
-        {(props) => (
+      > */}
+      {/* {(props) => (
           <Form style={{ width: '100%' }}>
             <VStack alignItems="flex-start">
               <Field name="musicDir">
@@ -111,7 +98,7 @@ const SettingsForm = (props: Props) => {
         >
           Browse
         </Button>
-      </FormControl>
+      </FormControl> */}
       <VStack w="100%">
         {Object.keys(settingsSwitchSchema).map((key) => {
           return (
@@ -129,7 +116,7 @@ const SettingsForm = (props: Props) => {
         })}
       </VStack>
 
-      <ConvertPlaylistModal />
+      {/* <ConvertPlaylistModal /> */}
     </>
   );
 };

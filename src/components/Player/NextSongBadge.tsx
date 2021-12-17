@@ -39,7 +39,7 @@ const NextSongBadge = () => {
   }, [priorityQueue[0], queue[0]]);
   const { data } = usePalette(next?.image || '');
 
-  if (!enableShowNext) {
+  if (!enableShowNext || !getCombinedQueue().length) {
     return null;
   }
   return (

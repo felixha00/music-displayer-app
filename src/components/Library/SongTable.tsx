@@ -1,61 +1,50 @@
-import React, { useCallback, useMemo, useEffect } from 'react';
 import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
+  Flex,
   Input,
   InputGroup,
   InputLeftElement,
-  Box,
-  VStack,
-  Flex,
-  Badge,
-  IconButton,
-  Text,
   Spacer,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
 } from '@chakra-ui/react';
+import _ from 'lodash';
+import moment from 'moment';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { ContextMenuTrigger } from 'react-contextmenu';
+import { RiArrowDownSFill, RiArrowUpSFill, RiSearchLine } from 'react-icons/ri';
 import {
-  useTable,
-  useSortBy,
-  useGlobalFilter,
-  useAsyncDebounce,
   HeaderGroup,
-  useFlexLayout,
   Row,
+  useAsyncDebounce,
+  useFlexLayout,
+  useGlobalFilter,
+  useSortBy,
+  useTable,
 } from 'react-table';
-import { RiArrowUpSFill, RiArrowDownSFill } from 'react-icons/ri';
-
-import './song-table.scss';
-import { RiSearchLine } from 'react-icons/ri';
-import { FixedSizeList } from 'react-window';
 import { AutoSizer } from 'react-virtualized';
+import { FixedSizeList } from 'react-window';
 import {
   insertIntoFrontOfQueue,
-  setQueue,
   setSong,
 } from '../../app/store/actions/playerActions';
+import { useModal } from '../../utils/hooks';
 import { sToMMSS } from '../../utils/time';
 import { ISong } from '../../utils/types';
-import { ContextMenuTrigger } from 'react-contextmenu';
-import GenerateCtxMenu, {
-  CustomMenuItemProps,
-} from '../ContextMenus/GenerateCtxMenu';
 import {
-  songInPlaylistCtxMenu,
   baseSongCtxMenu,
   CtxMenuTypes,
+  songInPlaylistCtxMenu,
 } from '../ContextMenus/ctxMenuSchemas';
-import AddToPlaylistModal from '../Playlist/AddToPlaylistModal';
-import { useModal } from '../../utils/hooks';
+import GenerateCtxMenu from '../ContextMenus/GenerateCtxMenu';
 import GenerateMenu, { MenuItemT } from '../GenerateMenu';
-import ContextMenu from '../ContextMenu';
-import { removeFromPlaylist } from '../../utils/playlists';
-import moment from 'moment';
-var momentDurationFormatSetup = require('moment-duration-format');
-import _ from 'lodash';
+import './song-table.scss';
+
+const momentDurationFormatSetup = require('moment-duration-format');
 
 momentDurationFormatSetup(moment);
 
@@ -74,6 +63,7 @@ const defaultProps = {
 
 interface GlobalFilterProps {
   preGlobalFilteredRows: Array<any>;
+  globalFilter: string;
 }
 
 const GlobalFilter = ({

@@ -16,7 +16,6 @@ export type SettingsConfig = {
   enableShowNext: boolean;
   enableBassGradient: boolean;
   enableReactiveTitle: boolean;
-  enableReactiveGradBg: boolean;
   enableReactiveBgScale: boolean;
 };
 
@@ -31,7 +30,6 @@ const initialState: SettingsState = {
     enableBassGradient: true,
     enableShowNext: true,
     enableReactiveTitle: true,
-    enableReactiveGradBg: true,
     enableReactiveBgScale: true,
   },
 };
